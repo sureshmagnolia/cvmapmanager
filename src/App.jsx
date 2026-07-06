@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './App.css';
 import { initialPapers, sessions, initialAllocations, teamChiefs, defaultExaminers } from './data';
+import SetupWizard from './SetupWizard';
 
 function App() {
   const [allocations, setAllocations] = useState(() => {
@@ -71,6 +72,15 @@ function App() {
       console.error(e);
     }
   };
+
+  const handleSetupComplete = (setupData) => {
+    setAllocations(setupData.allocations);
+    setExaminers(setupData.examiners);
+    setPapers(setupData.papers);
+    setSessionsList(setupData.sessionsList);
+    setChiefs(setupData.teamChiefs);
+  };
+
 
   const saveAsNewFile = async () => {
     try {
@@ -163,8 +173,11 @@ function App() {
     }));
   };
 
-  const params = new URLSearchParams(window.location.search);
-  const printMode = params.get('print');
+  const printMode = new URLSearchParams(window.location.search).get('print');
+
+  if (allocations.length === 0 && !printMode) {
+    return <SetupWizard onComplete={handleSetupComplete} />;
+  }
 
   const handlePrintOverview = () => {
     window.open(window.location.pathname + '?print=overview', '_blank');
