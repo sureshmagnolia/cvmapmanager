@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# PDF generation ignores
+venv/
+Examiner_Handbooks/
+examiner_data.json
