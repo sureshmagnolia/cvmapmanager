@@ -126,20 +126,26 @@ function App() {
   };
 
   const handlePrintOverview = () => {
-    document.body.classList.remove('print-daily-mode', 'print-rosters-mode');
+    document.body.classList.remove('print-daily-mode', 'print-rosters-mode', 'print-slips-mode');
     document.body.classList.add('print-overview-mode');
     window.print();
   };
 
   const handlePrintDaily = () => {
-    document.body.classList.remove('print-overview-mode', 'print-rosters-mode');
+    document.body.classList.remove('print-overview-mode', 'print-rosters-mode', 'print-slips-mode');
     document.body.classList.add('print-daily-mode');
     window.print();
   };
 
   const handlePrintRosters = () => {
-    document.body.classList.remove('print-overview-mode', 'print-daily-mode');
+    document.body.classList.remove('print-overview-mode', 'print-daily-mode', 'print-slips-mode');
     document.body.classList.add('print-rosters-mode');
+    window.print();
+  };
+
+  const handlePrintSlips = () => {
+    document.body.classList.remove('print-overview-mode', 'print-daily-mode', 'print-rosters-mode');
+    document.body.classList.add('print-slips-mode');
     window.print();
   };
 
@@ -158,6 +164,7 @@ function App() {
           <button className="btn-print" onClick={handlePrintOverview}>🖨️ Master Overview</button>
           <button className="btn-print" onClick={handlePrintDaily}>🖨️ Daily Handouts</button>
           <button className="btn-print" onClick={handlePrintRosters}>🖨️ Team Rosters</button>
+          <button className="btn-print" onClick={handlePrintSlips}>🖨️ Bundle Slips</button>
         </div>
       </header>
 
@@ -222,6 +229,7 @@ function App() {
       </div>
 
       <TeamRosters teamChiefs={teamChiefs} examiners={examiners} />
+      <BundleSlips computedAllocations={computedAllocations} initialPapers={initialPapers} teamChiefs={teamChiefs} />
     </div>
   );
 }
@@ -501,6 +509,78 @@ function TeamTable({ team, chief, examiners, sessions, computedAllocations, upda
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+
+function BundleSlips({ computedAllocations, initialPapers, teamChiefs }) {
+  // Sort allocations first by team, then by session, then by examiner
+  const validAllocations = computedAllocations.filter(a => a.actualCount > 0);
+  
+  // Create a flattened, ordered list of all examiner bundles. 
+  // Global sequence across all bundles.
+  let serialCounter = 1;
+  const slips = validAllocations.map(a => {
+    const chief = teamChiefs[a.team];
+    const paper = initialPapers[a.paper];
+    return {
+      serial: serialCounter++,
+      session: a.session,
+      qp: paper.qp,
+      examiner: a.examiner,
+      chief: chief,
+      paperName: paper.name,
+      start: a.start,
+      end: a.end,
+      count: a.actualCount
+    };
+  });
+
+  return (
+    <div className="slips-wrapper print-slips-only">
+      {slips.map(slip => (
+        <div key={slip.serial} className="slip-item">
+          <div className="slip-header">
+            <span className="slip-title">Answer Script Bundle</span>
+            <span className="slip-serial">Bundle {slip.serial}</span>
+          </div>
+          
+          <div className="slip-body">
+            <div className="slip-row">
+              <span className="slip-label">Date & Session</span>
+              <span className="slip-value">{slip.session}</span>
+            </div>
+            <div className="slip-row">
+              <span className="slip-label">QP Code</span>
+              <span className="slip-value">{slip.qp}</span>
+            </div>
+            <div className="slip-row">
+              <span className="slip-label">Examiner</span>
+              <span className="slip-value">{slip.examiner}</span>
+            </div>
+            <div className="slip-row">
+              <span className="slip-label">Chief Examiner</span>
+              <span className="slip-value">{slip.chief}</span>
+            </div>
+            <div className="slip-row" style={{ gridColumn: "span 2" }}>
+              <span className="slip-label">Paper</span>
+              <span className="slip-value">{slip.paperName}</span>
+            </div>
+          </div>
+          
+          <div className="slip-footer">
+            <div className="slip-row">
+              <span className="slip-label">False Numbers</span>
+              <span className="slip-false-nos">{slip.start} to {slip.end}</span>
+            </div>
+            <div className="slip-row" style={{textAlign: "right"}}>
+              <span className="slip-label">Total Scripts</span>
+              <span className="slip-count">{slip.count}</span>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
