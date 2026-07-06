@@ -129,20 +129,8 @@ function App() {
     }));
   };
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const printMode = params.get('print');
-    if (printMode === 'overview') {
-      document.body.classList.add('print-overview-mode');
-      setTimeout(() => window.print(), 500);
-    } else if (printMode === 'daily') {
-      document.body.classList.add('print-daily-mode');
-      setTimeout(() => window.print(), 500);
-    } else if (printMode === 'rosters') {
-      document.body.classList.add('print-rosters-mode');
-      setTimeout(() => window.print(), 500);
-    }
-  }, []);
+  const params = new URLSearchParams(window.location.search);
+  const printMode = params.get('print');
 
   const handlePrintOverview = () => {
     window.open(window.location.pathname + '?print=overview', '_blank');
@@ -160,9 +148,34 @@ function App() {
     window.open(window.location.pathname + '?print=slips', '_blank');
   };
 
-  const isPrintSlipsMode = window.location.search.includes('print=slips');
-  if (isPrintSlipsMode) {
+  if (printMode === 'slips') {
     return <BundleSlips standalone computedAllocations={computedAllocations} initialPapers={initialPapers} teamChiefs={teamChiefs} />;
+  }
+
+  if (printMode === 'overview') {
+    return (
+      <StandalonePrintWrapper title="Master Overview" orientation="landscape">
+        <TeamTable team="Team 1" chief={teamChiefs["Team 1"]} examiners={examiners["Team 1"]} sessions={sessions} computedAllocations={computedAllocations} updateCount={updateCount} swapExaminers={swapExaminers} />
+        <TeamTable team="Team 2" chief={teamChiefs["Team 2"]} examiners={examiners["Team 2"]} sessions={sessions} computedAllocations={computedAllocations} updateCount={updateCount} swapExaminers={swapExaminers} />
+      </StandalonePrintWrapper>
+    );
+  }
+
+  if (printMode === 'daily') {
+    return (
+      <StandalonePrintWrapper title="Daily Handouts" orientation="portrait">
+        <DailyReports team="Team 1" chief={teamChiefs["Team 1"]} examiners={examiners["Team 1"]} sessions={sessions} computedAllocations={computedAllocations} />
+        <DailyReports team="Team 2" chief={teamChiefs["Team 2"]} examiners={examiners["Team 2"]} sessions={sessions} computedAllocations={computedAllocations} />
+      </StandalonePrintWrapper>
+    );
+  }
+
+  if (printMode === 'rosters') {
+    return (
+      <StandalonePrintWrapper title="Team Rosters" orientation="portrait">
+        <TeamRosters teamChiefs={teamChiefs} examiners={examiners} />
+      </StandalonePrintWrapper>
+    );
   }
 
   return (
@@ -623,6 +636,44 @@ function BundleSlips({ computedAllocations, initialPapers, teamChiefs, standalon
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function StandalonePrintWrapper({ title, children, orientation = 'portrait' }) {
+  return (
+    <div className="standalone-print-page" style={{ background: 'white', minHeight: '100vh', padding: '2rem', color: 'black' }}>
+      <div className="no-print print-toolbar">
+        <label style={{ marginRight: '1rem' }}>
+          Paper Orientation: 
+          <select value={orientation} onChange={() => {}} disabled>
+            <option value={orientation}>{orientation.charAt(0).toUpperCase() + orientation.slice(1)}</option>
+          </select>
+        </label>
+        <button className="btn-print" onClick={() => window.print()}>🖨️ Print {title}</button>
+      </div>
+      <div className="print-content-wrapper" style={{ color: 'black' }}>
+        {children}
+      </div>
+      <style>{`
+        @page { size: A4 ${orientation}; margin: 5mm; }
+        body { background: #fff !important; }
+        /* Force black and white mode for all inner elements on screen to match print */
+        .team-section { background: #fff !important; border: none !important; box-shadow: none !important; margin-bottom: 2rem; padding: 0;}
+        h2 { color: #000 !important; }
+        .chief-box { background: transparent !important; color: #000 !important; border: 1px solid #000 !important; }
+        th { background: #f1f5f9 !important; color: #000 !important; border-bottom: 2px solid #000 !important; }
+        td { color: #000 !important; border-bottom: 1px solid #ccc !important; }
+        .bundle-content, .alloc-content { background: transparent !important; border: 1px solid #000 !important; box-shadow: none !important; }
+        .bundle-count, .alloc-paper { color: #000 !important; }
+        .alloc-range, .alloc-qp { color: #333 !important; }
+        .daily-title { color: #000 !important; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .daily-meta { color: #000 !important; }
+        .daily-chief-bundle { background: transparent !important; border: 2px dashed #000 !important; }
+        .daily-chief-bundle h3 { color: #000 !important; }
+        .plus-divider { color: #000 !important; }
+        .count-input { background: transparent !important; color: #000 !important; border: 1px solid #000 !important; }
+      `}</style>
     </div>
   );
 }
