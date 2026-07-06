@@ -82,22 +82,26 @@ function App() {
       };
     });
 
+    let serialCounter = 1;
+
     const computed = allocations.map(alloc => {
       const pKey = alloc.paper;
       const count = parseInt(alloc.count, 10) || 0;
       
       let start = null;
       let end = null;
+      let serial = null;
       
       if (count > 0) {
         start = trackers[pKey].current;
         end = start + count - 1;
+        serial = serialCounter++;
         trackers[pKey].current += count;
         trackers[pKey].remaining -= count;
         trackers[pKey].used += count;
       }
       
-      return { ...alloc, start, end, actualCount: count };
+      return { ...alloc, start, end, serial, actualCount: count };
     });
     
     return { computedAllocations: computed, paperStats: trackers };
@@ -360,6 +364,7 @@ function DailyReports({ team, chief, examiners, sessions, computedAllocations })
                                </div>
                                <div className="alloc-qp">[QP: {initialPapers[a.paper].qp}]</div>
                                <div className="alloc-range">({a.start} to {a.end})</div>
+                               <div className="alloc-serial" style={{color: 'black', fontWeight: 'bold', marginTop: '4px'}}>Bundle #{a.serial}</div>
                              </div>
                           ))}
                         </div>
@@ -524,12 +529,11 @@ function BundleSlips({ computedAllocations, initialPapers, teamChiefs, standalon
   const validAllocations = computedAllocations.filter(a => a.actualCount > 0);
   
   // Create a flattened, ordered list of all examiner bundles. 
-  let serialCounter = 1;
   const slips = validAllocations.map(a => {
     const chief = teamChiefs[a.team];
     const paper = initialPapers[a.paper];
     return {
-      serial: serialCounter++,
+      serial: a.serial,
       session: a.session,
       qp: paper.qp,
       examiner: a.examiner,
