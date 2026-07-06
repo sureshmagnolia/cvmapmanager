@@ -4,20 +4,35 @@ import { initialPapers, sessions, initialAllocations, teamChiefs, defaultExamine
 
 function App() {
   const [allocations, setAllocations] = useState(() => {
-    const saved = localStorage.getItem('valuation_allocations_camp2_v4');
+    const saved = localStorage.getItem('valuation_allocations_camp2_v5');
     return saved ? JSON.parse(saved) : initialAllocations;
   });
   const [examiners, setExaminers] = useState(() => {
-    const saved = localStorage.getItem('valuation_examiners_camp2_v4');
+    const saved = localStorage.getItem('valuation_examiners_camp2_v5');
     return saved ? JSON.parse(saved) : defaultExaminers;
+  });
+  const [papers, setPapers] = useState(() => {
+    const saved = localStorage.getItem('valuation_papers_camp2_v5');
+    return saved ? JSON.parse(saved) : initialPapers;
+  });
+  const [sessionsList, setSessionsList] = useState(() => {
+    const saved = localStorage.getItem('valuation_sessions_camp2_v5');
+    return saved ? JSON.parse(saved) : sessions;
+  });
+  const [chiefs, setChiefs] = useState(() => {
+    const saved = localStorage.getItem('valuation_chiefs_camp2_v5');
+    return saved ? JSON.parse(saved) : teamChiefs;
   });
   const [fileHandle, setFileHandle] = useState(null);
 
   // Auto-save to localStorage seamlessly on every change
   useEffect(() => {
-    localStorage.setItem('valuation_allocations_camp2_v4', JSON.stringify(allocations));
-    localStorage.setItem('valuation_examiners_camp2_v4', JSON.stringify(examiners));
-  }, [allocations, examiners]);
+    localStorage.setItem('valuation_allocations_camp2_v5', JSON.stringify(allocations));
+    localStorage.setItem('valuation_examiners_camp2_v5', JSON.stringify(examiners));
+    localStorage.setItem('valuation_papers_camp2_v5', JSON.stringify(papers));
+    localStorage.setItem('valuation_sessions_camp2_v5', JSON.stringify(sessionsList));
+    localStorage.setItem('valuation_chiefs_camp2_v5', JSON.stringify(chiefs));
+  }, [allocations, examiners, papers, sessionsList, chiefs]);
 
   // Auto-save when state changes and file is connected
   useEffect(() => {
@@ -25,7 +40,7 @@ function App() {
       const saveData = async () => {
         try {
           const writable = await fileHandle.createWritable();
-          await writable.write(JSON.stringify({ allocations, examiners }, null, 2));
+          await writable.write(JSON.stringify({ allocations, examiners, papers, sessionsList, chiefs }, null, 2));
           await writable.close();
         } catch (e) {
           console.error("Auto-save failed", e);
@@ -33,7 +48,7 @@ function App() {
       };
       saveData();
     }
-  }, [allocations, examiners, fileHandle]);
+  }, [allocations, examiners, papers, sessionsList, chiefs, fileHandle]);
 
   const loadFromFile = async () => {
     try {
@@ -46,6 +61,9 @@ function App() {
       if (data.allocations && data.examiners) {
         setAllocations(data.allocations);
         setExaminers(data.examiners);
+        if (data.papers) setPapers(data.papers);
+        if (data.sessionsList) setSessionsList(data.sessionsList);
+        if (data.chiefs) setChiefs(data.chiefs);
         setFileHandle(handle);
         alert("Data loaded successfully! Auto-saving is now active.");
       }
@@ -61,7 +79,7 @@ function App() {
         types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
       });
       const writable = await handle.createWritable();
-      await writable.write(JSON.stringify({ allocations, examiners }, null, 2));
+      await writable.write(JSON.stringify({ allocations, examiners, papers, sessionsList, chiefs }, null, 2));
       await writable.close();
       setFileHandle(handle);
       alert("File created! Auto-saving is now active to this file.");
@@ -74,17 +92,17 @@ function App() {
   const { computedAllocations, paperStats } = useMemo(() => {
     // Clone papers to track current false numbers and remaining counts
     const trackers = {};
-    Object.keys(initialPapers).forEach(key => {
+    Object.keys(papers).forEach(key => {
       trackers[key] = {
-        current: initialPapers[key].start,
-        remaining: initialPapers[key].count,
+        current: papers[key].start,
+        remaining: papers[key].count,
         used: 0
       };
     });
 
     let serialCounter = 1;
 
-    const sessionOrder = sessions.reduce((acc, s, i) => ({ ...acc, [s]: i }), {});
+    const sessionOrder = sessionsList.reduce((acc, s, i) => ({ ...acc, [s]: i }), {});
     const examinerOrder = {};
     Object.keys(examiners).forEach(team => {
       examinerOrder[team] = examiners[team].reduce((acc, ex, i) => ({ ...acc, [ex]: i }), {});
@@ -121,7 +139,7 @@ function App() {
     });
     
     return { computedAllocations: computed, paperStats: trackers };
-  }, [allocations]);
+  }, [allocations, examiners, papers, sessionsList]);
 
   const updateCount = (id, newCount) => {
     setAllocations(prev => prev.map(a => a.id === id ? { ...a, count: newCount } : a));
@@ -165,14 +183,14 @@ function App() {
   };
 
   if (printMode === 'slips') {
-    return <BundleSlips standalone computedAllocations={computedAllocations} initialPapers={initialPapers} teamChiefs={teamChiefs} />;
+    return <BundleSlips standalone computedAllocations={computedAllocations} initialPapers={papers} teamChiefs={chiefs} />;
   }
 
   if (printMode === 'overview') {
     return (
       <StandalonePrintWrapper title="Master Overview" orientation="landscape">
-        <TeamTable team="Team 1" chief={teamChiefs["Team 1"]} examiners={examiners["Team 1"]} sessions={sessions} computedAllocations={computedAllocations} updateCount={updateCount} swapExaminers={swapExaminers} />
-        <TeamTable team="Team 2" chief={teamChiefs["Team 2"]} examiners={examiners["Team 2"]} sessions={sessions} computedAllocations={computedAllocations} updateCount={updateCount} swapExaminers={swapExaminers} />
+        <TeamTable team="Team 1" chief={chiefs["Team 1"]} examiners={examiners["Team 1"]} sessions={sessionsList} computedAllocations={computedAllocations} updateCount={updateCount} swapExaminers={swapExaminers} />
+        <TeamTable team="Team 2" chief={chiefs["Team 2"]} examiners={examiners["Team 2"]} sessions={sessionsList} computedAllocations={computedAllocations} updateCount={updateCount} swapExaminers={swapExaminers} />
       </StandalonePrintWrapper>
     );
   }
@@ -180,8 +198,8 @@ function App() {
   if (printMode === 'daily') {
     return (
       <StandalonePrintWrapper title="Daily Handouts" orientation="portrait">
-        <DailyReports team="Team 1" chief={teamChiefs["Team 1"]} examiners={examiners["Team 1"]} sessions={sessions} computedAllocations={computedAllocations} />
-        <DailyReports team="Team 2" chief={teamChiefs["Team 2"]} examiners={examiners["Team 2"]} sessions={sessions} computedAllocations={computedAllocations} />
+        <DailyReports team="Team 1" chief={chiefs["Team 1"]} examiners={examiners["Team 1"]} sessions={sessionsList} computedAllocations={computedAllocations} papers={papers} />
+        <DailyReports team="Team 2" chief={chiefs["Team 2"]} examiners={examiners["Team 2"]} sessions={sessionsList} computedAllocations={computedAllocations} papers={papers} />
       </StandalonePrintWrapper>
     );
   }
@@ -189,7 +207,7 @@ function App() {
   if (printMode === 'rosters') {
     return (
       <StandalonePrintWrapper title="Team Rosters" orientation="portrait">
-        <TeamRosters teamChiefs={teamChiefs} examiners={examiners} />
+        <TeamRosters teamChiefs={chiefs} examiners={examiners} standalone={true} />
       </StandalonePrintWrapper>
     );
   }
@@ -217,12 +235,12 @@ function App() {
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
           <h2 style={{margin: 0}}>Papers Overview</h2>
           <div style={{background: 'rgba(15, 23, 42, 0.6)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)'}}>
-            <span style={{marginRight: '1rem', color: '#94a3b8'}}>Grand Total: <strong style={{color: '#f8fafc'}}>{Object.values(initialPapers).reduce((sum, p) => sum + p.count, 0)}</strong></span>
+            <span style={{marginRight: '1rem', color: '#94a3b8'}}>Grand Total: <strong style={{color: '#f8fafc'}}>{Object.values(papers).reduce((sum, p) => sum + p.count, 0)}</strong></span>
             <span style={{color: '#94a3b8'}}>Total Remaining: <strong style={{color: Object.values(paperStats).reduce((sum, s) => sum + s.remaining, 0) === 0 ? '#10b981' : '#f59e0b'}}>{Object.values(paperStats).reduce((sum, s) => sum + s.remaining, 0)}</strong></span>
           </div>
         </div>
         <div className="paper-cards">
-          {Object.entries(initialPapers).map(([key, p]) => {
+          {Object.entries(papers).map(([key, p]) => {
             const stats = paperStats[key];
             const isOver = stats.remaining < 0;
             const isUnder = stats.remaining > 0;
@@ -243,20 +261,22 @@ function App() {
       <div className="tables-container print-overview-only">
         <TeamTable 
           team="Team 1" 
-          chief={teamChiefs["Team 1"]} 
+          chief={chiefs["Team 1"]} 
           examiners={examiners["Team 1"]}
-          sessions={sessions}
+          sessions={sessionsList}
           computedAllocations={computedAllocations}
+          papers={papers}
           updateCount={updateCount}
           swapExaminers={swapExaminers}
         />
         
         <TeamTable 
           team="Team 2" 
-          chief={teamChiefs["Team 2"]} 
+          chief={chiefs["Team 2"]} 
           examiners={examiners["Team 2"]}
-          sessions={sessions}
+          sessions={sessionsList}
           computedAllocations={computedAllocations}
+          papers={papers}
           updateCount={updateCount}
           swapExaminers={swapExaminers}
         />
@@ -265,29 +285,31 @@ function App() {
       <div className="daily-reports-wrapper print-daily-only">
         <DailyReports 
           team="Team 1" 
-          chief={teamChiefs["Team 1"]} 
+          chief={chiefs["Team 1"]} 
           examiners={examiners["Team 1"]}
-          sessions={sessions}
+          sessions={sessionsList}
           computedAllocations={computedAllocations}
+          papers={papers}
         />
         <DailyReports 
           team="Team 2" 
-          chief={teamChiefs["Team 2"]} 
+          chief={chiefs["Team 2"]} 
           examiners={examiners["Team 2"]}
-          sessions={sessions}
+          sessions={sessionsList}
           computedAllocations={computedAllocations}
+          papers={papers}
         />
       </div>
 
-      <TeamRosters teamChiefs={teamChiefs} examiners={examiners} />
-      <BundleSlips computedAllocations={computedAllocations} initialPapers={initialPapers} teamChiefs={teamChiefs} />
+      <TeamRosters teamChiefs={chiefs} examiners={examiners} />
+      <BundleSlips computedAllocations={computedAllocations} initialPapers={papers} teamChiefs={chiefs} />
     </div>
   );
 }
 
-function TeamRosters({ teamChiefs, examiners }) {
+function TeamRosters({ teamChiefs, examiners, standalone }) {
   return (
-    <div className="rosters-wrapper print-rosters-only">
+    <div className={standalone ? "rosters-wrapper" : "rosters-wrapper print-rosters-only"}>
       {Object.keys(teamChiefs).map(team => (
         <div key={team} className="roster-page">
           <div className="roster-header">
@@ -319,7 +341,7 @@ function TeamRosters({ teamChiefs, examiners }) {
   );
 }
 
-function DailyReports({ team, chief, examiners, sessions, computedAllocations }) {
+function DailyReports({ team, chief, examiners, sessions, computedAllocations, papers }) {
   // Build grid: [session][examiner] = array of allocs
   const sessionGrid = {};
   sessions.forEach(s => sessionGrid[s] = {});
@@ -340,7 +362,7 @@ function DailyReports({ team, chief, examiners, sessions, computedAllocations })
     let sessionTotal = 0;
     sessionAllocs.forEach(a => {
       if (!paperGroups[a.paper]) {
-        paperGroups[a.paper] = { count: 0, start: a.start, end: a.end, qp: initialPapers[a.paper].qp, name: initialPapers[a.paper].name };
+        paperGroups[a.paper] = { count: 0, start: a.start, end: a.end, qp: papers[a.paper].qp, name: papers[a.paper].name };
       }
       paperGroups[a.paper].count += a.actualCount;
       paperGroups[a.paper].start = Math.min(paperGroups[a.paper].start, a.start);
@@ -400,13 +422,13 @@ function DailyReports({ team, chief, examiners, sessions, computedAllocations })
                       <td className="examiner-name">{ex}</td>
                       <td>
                         <div className="daily-alloc-cards">
-                          {allocs.map((a, i) => (
+                          {allocs.map((a) => (
                              <div key={a.id} className="alloc-content daily-alloc-card">
                                <div className="alloc-header">
                                  <span className="alloc-count" style={{fontWeight: 'bold', fontSize: '1.2em', color: 'black'}}>{a.actualCount}</span>
-                                 <span className="alloc-paper" style={{marginLeft: '8px'}}>{initialPapers[a.paper].name}</span>
+                                 <span className="alloc-paper" style={{marginLeft: '8px'}}>{papers[a.paper].name}</span>
                                </div>
-                               <div className="alloc-qp">[QP: {initialPapers[a.paper].qp}]</div>
+                               <div className="alloc-qp">[QP: {papers[a.paper].qp}]</div>
                                <div className="alloc-range">({a.start} to {a.end})</div>
                                <div className="alloc-serial" style={{color: 'black', fontWeight: 'bold', marginTop: '4px'}}>Bundle #{a.serial}</div>
                              </div>
@@ -426,7 +448,7 @@ function DailyReports({ team, chief, examiners, sessions, computedAllocations })
   );
 }
 
-function TeamTable({ team, chief, examiners, sessions, computedAllocations, updateCount, swapExaminers }) {
+function TeamTable({ team, chief, examiners, sessions, computedAllocations, papers, updateCount, swapExaminers }) {
   const [swap1, setSwap1] = useState('');
   const [swap2, setSwap2] = useState('');
 
@@ -456,7 +478,7 @@ function TeamTable({ team, chief, examiners, sessions, computedAllocations, upda
     let sessionTotal = 0;
     sessionAllocs.forEach(a => {
       if (!paperGroups[a.paper]) {
-        paperGroups[a.paper] = { count: 0, start: a.start, end: a.end, qp: initialPapers[a.paper].qp };
+        paperGroups[a.paper] = { count: 0, start: a.start, end: a.end, qp: papers[a.paper].qp };
       }
       paperGroups[a.paper].count += a.actualCount;
       paperGroups[a.paper].start = Math.min(paperGroups[a.paper].start, a.start);
@@ -506,7 +528,7 @@ function TeamTable({ team, chief, examiners, sessions, computedAllocations, upda
                     <div key={pKey} className="bundle-block">
                       {j > 0 && <div className="plus-divider">+</div>}
                       <div className="bundle-content">
-                        <div className="bundle-count">{data.count} {initialPapers[pKey].name}</div>
+                        <div className="bundle-count">{data.count} {papers[pKey].name}</div>
                         <div className="alloc-qp">[QP: {data.qp}]</div>
                         <div className="alloc-range">({data.start} to {data.end})</div>
                       </div>
@@ -541,9 +563,9 @@ function TeamTable({ team, chief, examiners, sessions, computedAllocations, upda
                                     onChange={e => updateCount(a.id, e.target.value)} 
                                   />
                                   <span className="print-only alloc-count">{a.actualCount}</span>
-                                  <span className="alloc-paper">{initialPapers[a.paper].name}</span>
+                                  <span className="alloc-paper">{papers[a.paper].name}</span>
                                 </div>
-                                <div className="alloc-qp">[QP: {initialPapers[a.paper].qp}]</div>
+                                <div className="alloc-qp">[QP: {papers[a.paper].qp}]</div>
                                 {a.actualCount > 0 && (
                                   <div className="alloc-range">({a.start} to {a.end})</div>
                                 )}
