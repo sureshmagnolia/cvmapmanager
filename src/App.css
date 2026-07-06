@@ -911,3 +911,120 @@ td.examiner-name {
     color: black !important;
   }
 }
+
+/* STANDALONE PREVIEW OVERRIDES (Matches Print) */
+.standalone-print-page {
+  background: white;
+  color: black;
+}
+
+.standalone-print-page .team-section {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 2rem;
+  padding: 0;
+}
+
+.standalone-print-page .team-title-block h2 {
+  color: black !important;
+}
+
+.standalone-print-page .chief-box {
+  background: transparent !important;
+  border: 1px solid black !important;
+  color: black !important;
+}
+
+.standalone-print-page table {
+  background: transparent !important;
+  color: black !important;
+}
+
+.standalone-print-page th {
+  background: #f0f0f0 !important;
+  color: black !important;
+  border: 1px solid #000 !important;
+}
+
+.standalone-print-page td {
+  border: 1px solid #000 !important;
+  color: black !important;
+  background: transparent !important;
+}
+
+.standalone-print-page td.examiner-name {
+  color: black !important;
+  background: transparent !important;
+}
+
+.standalone-print-page td.total-col {
+  background: transparent !important;
+  color: black !important;
+}
+
+.standalone-print-page .alloc-content, 
+.standalone-print-page .bundle-content {
+  background: transparent !important;
+  border: 1px solid #000 !important;
+  box-shadow: none !important;
+}
+
+.standalone-print-page .bundle-block {
+  background: transparent !important;
+  border: none !important;
+}
+
+.standalone-print-page .chief-bundle-row {
+  background: transparent !important;
+}
+
+.standalone-print-page .bundle-label, 
+.standalone-print-page .bundle-count, 
+.standalone-print-page .alloc-paper, 
+.standalone-print-page .alloc-qp, 
+.standalone-print-page .alloc-range, 
+.standalone-print-page .plus-divider, 
+.standalone-print-page .empty-cell {
+  color: black !important;
+}
+
+.standalone-print-page .count-input {
+  background: transparent !important;
+  color: black !important;
+  border: 1px solid black !important;
+}
+
+/* Daily Handouts Specific Overrides */
+.standalone-print-page .daily-title {
+  color: black !important;
+}
+
+.standalone-print-page .daily-meta {
+  color: black !important;
+}
+
+.standalone-print-page .daily-chief-bundle {
+  background: transparent !important;
+  border: 1px solid black !important;
+}
+
+.standalone-print-page .daily-chief-bundle h3 {
+  color: black !important;
+}
+
+/* Rosters Overrides */
+.standalone-print-page .roster-card, 
+.standalone-print-page .chief-card {
+  background: transparent !important;
+  border: 1px solid black !important;
+}
+
+.standalone-print-page .roster-chief h2, 
+.standalone-print-page .roster-members h2 {
+  color: black !important;
+}
+
+.standalone-print-page .roster-number {
+  color: black !important;
+}

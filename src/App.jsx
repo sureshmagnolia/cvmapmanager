@@ -657,22 +657,6 @@ function StandalonePrintWrapper({ title, children, orientation = 'portrait' }) {
       </div>
       <style>{`
         @page { size: A4 ${orientation}; margin: 5mm; }
-        body { background: #fff !important; }
-        /* Force black and white mode for all inner elements on screen to match print */
-        .team-section { background: #fff !important; border: none !important; box-shadow: none !important; margin-bottom: 2rem; padding: 0;}
-        h2 { color: #000 !important; }
-        .chief-box { background: transparent !important; color: #000 !important; border: 1px solid #000 !important; }
-        th { background: #f1f5f9 !important; color: #000 !important; border-bottom: 2px solid #000 !important; }
-        td { color: #000 !important; border-bottom: 1px solid #ccc !important; }
-        .bundle-content, .alloc-content { background: transparent !important; border: 1px solid #000 !important; box-shadow: none !important; }
-        .bundle-count, .alloc-paper { color: #000 !important; }
-        .alloc-range, .alloc-qp { color: #333 !important; }
-        .daily-title { color: #000 !important; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .daily-meta { color: #000 !important; }
-        .daily-chief-bundle { background: transparent !important; border: 2px dashed #000 !important; }
-        .daily-chief-bundle h3 { color: #000 !important; }
-        .plus-divider { color: #000 !important; }
-        .count-input { background: transparent !important; color: #000 !important; border: 1px solid #000 !important; }
       `}</style>
     </div>
   );
