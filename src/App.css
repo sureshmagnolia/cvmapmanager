@@ -799,7 +799,7 @@ td.examiner-name {
   }
   
   .team-section {
-    background: white;
+    background: transparent !important;
     border: none;
     box-shadow: none;
     padding: 0;
@@ -815,8 +815,8 @@ td.examiner-name {
   }
   
   .chief-box {
-    background: transparent;
-    border: 1px solid black;
+    background: transparent !important;
+    border: 1px solid black !important;
     color: black !important;
     padding: 2px 4px;
   }
@@ -827,13 +827,15 @@ td.examiner-name {
     table-layout: fixed;
     font-size: 8.5pt;
     color: black !important;
+    background: transparent !important;
   }
   
   th, td {
-    border: 1px solid #000;
+    border: 1px solid #000 !important;
     padding: 3px;
     color: black !important;
     word-wrap: break-word;
+    background: transparent !important;
   }
   
   th {
@@ -846,12 +848,14 @@ td.examiner-name {
     width: 60px !important;
     text-align: center;
     font-weight: bold;
+    background: transparent !important;
   }
   
   td.examiner-name {
     color: black !important;
     font-weight: bold;
     width: 150px;
+    background: transparent !important;
   }
   
   .bundle-label, .bundle-count, .alloc-paper, .alloc-qp, .alloc-range, .plus-divider, .empty-cell {
@@ -863,7 +867,7 @@ td.examiner-name {
   }
 
   .alloc-content, .bundle-content {
-    background: #fff !important;
+    background: transparent !important;
     border: 1px solid #000 !important;
     border-radius: 4px;
     padding: 6px !important;
@@ -872,6 +876,11 @@ td.examiner-name {
     page-break-inside: avoid;
   }
   
+  .bundle-block {
+    background: transparent !important;
+    border: none !important;
+  }
+
   .plus-divider {
     text-align: center;
     color: black !important;
@@ -881,10 +890,24 @@ td.examiner-name {
   }
   
   .chief-bundle-row {
-    background: #f8f8f8;
+    background: transparent !important;
   }
   
   .bundle-label {
-    color: black;
+    color: black !important;
+  }
+
+  .roster-card, .chief-card {
+    background: transparent !important;
+    border: 1px solid black !important;
+  }
+
+  .roster-chief h2, .roster-members h2 {
+    color: black !important;
+    border-bottom: 1px solid black !important;
+  }
+
+  .roster-number {
+    color: black !important;
   }
 }
