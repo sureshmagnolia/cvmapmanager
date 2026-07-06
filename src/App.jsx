@@ -129,22 +129,31 @@ function App() {
     }));
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const printMode = params.get('print');
+    if (printMode === 'overview') {
+      document.body.classList.add('print-overview-mode');
+      setTimeout(() => window.print(), 500);
+    } else if (printMode === 'daily') {
+      document.body.classList.add('print-daily-mode');
+      setTimeout(() => window.print(), 500);
+    } else if (printMode === 'rosters') {
+      document.body.classList.add('print-rosters-mode');
+      setTimeout(() => window.print(), 500);
+    }
+  }, []);
+
   const handlePrintOverview = () => {
-    document.body.classList.remove('print-daily-mode', 'print-rosters-mode', 'print-slips-mode');
-    document.body.classList.add('print-overview-mode');
-    window.print();
+    window.open(window.location.pathname + '?print=overview', '_blank');
   };
 
   const handlePrintDaily = () => {
-    document.body.classList.remove('print-overview-mode', 'print-rosters-mode', 'print-slips-mode');
-    document.body.classList.add('print-daily-mode');
-    window.print();
+    window.open(window.location.pathname + '?print=daily', '_blank');
   };
 
   const handlePrintRosters = () => {
-    document.body.classList.remove('print-overview-mode', 'print-daily-mode', 'print-slips-mode');
-    document.body.classList.add('print-rosters-mode');
-    window.print();
+    window.open(window.location.pathname + '?print=rosters', '_blank');
   };
 
   const handlePrintSlips = () => {
@@ -176,7 +185,13 @@ function App() {
       </header>
 
       <div className="no-print paper-dashboard">
-        <h2>Papers Overview</h2>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+          <h2 style={{margin: 0}}>Papers Overview</h2>
+          <div style={{background: 'rgba(15, 23, 42, 0.6)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)'}}>
+            <span style={{marginRight: '1rem', color: '#94a3b8'}}>Grand Total: <strong style={{color: '#f8fafc'}}>{Object.values(initialPapers).reduce((sum, p) => sum + p.count, 0)}</strong></span>
+            <span style={{color: '#94a3b8'}}>Total Remaining: <strong style={{color: Object.values(paperStats).reduce((sum, s) => sum + s.remaining, 0) === 0 ? '#10b981' : '#f59e0b'}}>{Object.values(paperStats).reduce((sum, s) => sum + s.remaining, 0)}</strong></span>
+          </div>
+        </div>
         <div className="paper-cards">
           {Object.entries(initialPapers).map(([key, p]) => {
             const stats = paperStats[key];
