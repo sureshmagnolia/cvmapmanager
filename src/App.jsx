@@ -241,6 +241,12 @@ function App() {
           <button className="btn-print" onClick={handlePrintDaily}>🖨️ Daily Handouts</button>
           <button className="btn-print" onClick={handlePrintRosters}>🖨️ Team Rosters</button>
           <button className="btn-print" onClick={handlePrintSlips}>🖨️ Bundle Slips</button>
+          <button className="btn-secondary" onClick={saveAsNewFile}>💾 Save Backup</button>
+          <button className="btn-danger" style={{marginLeft: '1rem'}} onClick={() => {
+            if (window.confirm('This will clear current allocations and return to the Setup Wizard. Continue?')) {
+              setAllocations([]);
+            }
+          }}>⚙️ Modify Setup</button>
         </div>
       </header>
 

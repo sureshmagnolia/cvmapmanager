@@ -1,22 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SetupWizard.css';
 
 function SetupWizard({ onComplete }) {
   const [step, setStep] = useState(1);
   
-  // Data States
-  const [fnRate, setFnRate] = useState(18);
-  const [anRate, setAnRate] = useState(12);
+  // Data States with localStorage persistence
+  const [fnRate, setFnRate] = useState(() => {
+    const saved = localStorage.getItem('vw_fnRate');
+    return saved ? parseInt(saved) : 18;
+  });
+  const [anRate, setAnRate] = useState(() => {
+    const saved = localStorage.getItem('vw_anRate');
+    return saved ? parseInt(saved) : 12;
+  });
 
-  const [sessions, setSessions] = useState([
-    { date: '2026-07-07', type: 'FN' },
-    { date: '2026-07-07', type: 'AN' },
-    { date: '2026-07-08', type: 'FN' },
-    { date: '2026-07-08', type: 'AN' }
-  ]);
-  const [teams, setTeams] = useState([{ name: 'Team 1', chief: '' }]);
-  const [examinersData, setExaminersData] = useState([{ team: 'Team 1', name: '' }]);
-  const [papersList, setPapersList] = useState([{ id: 'Paper1', name: '', qp: '', start: 1000000, count: 100 }]);
+  const [sessions, setSessions] = useState(() => {
+    const saved = localStorage.getItem('vw_sessions');
+    return saved ? JSON.parse(saved) : [
+      { date: '2026-07-07', type: 'FN' },
+      { date: '2026-07-07', type: 'AN' },
+      { date: '2026-07-08', type: 'FN' },
+      { date: '2026-07-08', type: 'AN' }
+    ];
+  });
+  const [teams, setTeams] = useState(() => {
+    const saved = localStorage.getItem('vw_teams');
+    return saved ? JSON.parse(saved) : [{ name: 'Team 1', chief: '' }];
+  });
+  const [examinersData, setExaminersData] = useState(() => {
+    const saved = localStorage.getItem('vw_examinersData');
+    return saved ? JSON.parse(saved) : [{ team: 'Team 1', name: '' }];
+  });
+  const [papersList, setPapersList] = useState(() => {
+    const saved = localStorage.getItem('vw_papersList');
+    return saved ? JSON.parse(saved) : [{ id: 'Paper1', name: '', qp: '', start: 1000000, end: 1000099 }];
+  });
+
+  // Auto-save Wizard state
+  useEffect(() => localStorage.setItem('vw_fnRate', fnRate), [fnRate]);
+  useEffect(() => localStorage.setItem('vw_anRate', anRate), [anRate]);
+  useEffect(() => localStorage.setItem('vw_sessions', JSON.stringify(sessions)), [sessions]);
+  useEffect(() => localStorage.setItem('vw_teams', JSON.stringify(teams)), [teams]);
+  useEffect(() => localStorage.setItem('vw_examinersData', JSON.stringify(examinersData)), [examinersData]);
+  useEffect(() => localStorage.setItem('vw_papersList', JSON.stringify(papersList)), [papersList]);
 
   // Handlers for Sessions
   const addSession = () => setSessions([...sessions, { date: '', type: 'FN' }]);
@@ -45,10 +71,10 @@ function SetupWizard({ onComplete }) {
   const removeExaminer = (index) => setExaminersData(examinersData.filter((_, i) => i !== index));
 
   // Handlers for Papers
-  const addPaper = () => setPapersList([...papersList, { id: `Paper${papersList.length + 1}`, name: '', qp: '', start: 1000000, count: 100 }]);
+  const addPaper = () => setPapersList([...papersList, { id: `Paper${papersList.length + 1}`, name: '', qp: '', start: 1000000, end: 1000099 }]);
   const updatePaper = (index, field, value) => {
     const newP = [...papersList];
-    newP[index][field] = field === 'start' || field === 'count' ? parseInt(value) || 0 : value;
+    newP[index][field] = field === 'start' || field === 'end' ? parseInt(value) || 0 : value;
     setPapersList(newP);
   };
   const removePaper = (index) => setPapersList(papersList.filter((_, i) => i !== index));
@@ -85,7 +111,9 @@ function SetupWizard({ onComplete }) {
     const papers = {};
     papersList.forEach(p => {
       if (p.id) {
-        papers[p.id] = { name: p.name, qp: p.qp, start: p.start, count: p.count };
+        // Calculate count dynamically from start and end false numbers
+        const calculatedCount = p.end >= p.start ? (p.end - p.start + 1) : 0;
+        papers[p.id] = { name: p.name, qp: p.qp, start: p.start, count: calculatedCount };
       }
     });
 
@@ -229,14 +257,14 @@ function SetupWizard({ onComplete }) {
         {step === 4 && (
           <div className="step-content">
             <h2>Step 4: Papers & False Numbers</h2>
-            <p>Define the subjects to be valued and their starting false numbers.</p>
+            <p>Define the subjects to be valued and their starting and ending false numbers.</p>
             {papersList.map((paper, index) => (
               <div key={index} className="input-group paper-group">
                 <input value={paper.id} onChange={(e) => updatePaper(index, 'id', e.target.value)} placeholder="Short ID (e.g. EVS)" />
                 <input value={paper.name} onChange={(e) => updatePaper(index, 'name', e.target.value)} placeholder="Full Subject Name" />
                 <input value={paper.qp} onChange={(e) => updatePaper(index, 'qp', e.target.value)} placeholder="QP Code" />
                 <input type="number" value={paper.start} onChange={(e) => updatePaper(index, 'start', e.target.value)} placeholder="Start False No" title="Start False No" />
-                <input type="number" value={paper.count} onChange={(e) => updatePaper(index, 'count', e.target.value)} placeholder="Total Scripts" title="Total Scripts" />
+                <input type="number" value={paper.end} onChange={(e) => updatePaper(index, 'end', e.target.value)} placeholder="End False No" title="End False No" />
                 <button onClick={() => removePaper(index)} className="btn-danger">X</button>
               </div>
             ))}
