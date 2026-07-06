@@ -144,10 +144,13 @@ function App() {
   };
 
   const handlePrintSlips = () => {
-    document.body.classList.remove('print-overview-mode', 'print-daily-mode', 'print-rosters-mode');
-    document.body.classList.add('print-slips-mode');
-    window.print();
+    window.open(window.location.pathname + '?print=slips', '_blank');
   };
+
+  const isPrintSlipsMode = window.location.search.includes('print=slips');
+  if (isPrintSlipsMode) {
+    return <BundleSlips standalone computedAllocations={computedAllocations} initialPapers={initialPapers} teamChiefs={teamChiefs} />;
+  }
 
   return (
     <div className="app-container">
@@ -514,12 +517,13 @@ function TeamTable({ team, chief, examiners, sessions, computedAllocations, upda
 }
 
 
-function BundleSlips({ computedAllocations, initialPapers, teamChiefs }) {
+function BundleSlips({ computedAllocations, initialPapers, teamChiefs, standalone }) {
+  const [orientation, setOrientation] = useState('portrait');
+
   // Sort allocations first by team, then by session, then by examiner
   const validAllocations = computedAllocations.filter(a => a.actualCount > 0);
   
   // Create a flattened, ordered list of all examiner bundles. 
-  // Global sequence across all bundles.
   let serialCounter = 1;
   const slips = validAllocations.map(a => {
     const chief = teamChiefs[a.team];
@@ -538,7 +542,25 @@ function BundleSlips({ computedAllocations, initialPapers, teamChiefs }) {
   });
 
   return (
-    <div className="slips-wrapper print-slips-only">
+    <div className={standalone ? "slips-standalone" : "slips-wrapper print-slips-only"}>
+      {standalone && (
+        <div className="no-print print-toolbar">
+          <label>
+            Paper Orientation: 
+            <select value={orientation} onChange={e => setOrientation(e.target.value)}>
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </label>
+          <button className="btn-print" onClick={() => window.print()}>🖨️ Print Now</button>
+          <style>{`
+            @page { size: A4 ${orientation}; margin: 5mm; }
+            body { background: #fff; }
+            .slip-item { height: 18vh; margin-bottom: 1.5vh; page-break-inside: avoid; border: 2px dashed #000; padding: 10px; }
+          `}</style>
+        </div>
+      )}
+      
       {slips.map(slip => (
         <div key={slip.serial} className="slip-item">
           <div className="slip-header">
