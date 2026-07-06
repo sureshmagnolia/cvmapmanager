@@ -180,20 +180,6 @@ function SetupWizard({ onComplete }) {
               </div>
             ))}
             <button onClick={addSession} className="btn-secondary">+ Add Session</button>
-
-            <div className="rate-settings" style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-              <h3 style={{ color: '#cbd5e1', marginBottom: '1rem' }}>Auto-Allocator Settings</h3>
-              <div className="input-group" style={{ display: 'flex', gap: '2rem' }}>
-                <label style={{ color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  FN Capacity:
-                  <input type="number" value={fnRate} onChange={(e) => setFnRate(parseInt(e.target.value) || 0)} style={{ width: '100px', flex: 'none' }} />
-                </label>
-                <label style={{ color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  AN Capacity:
-                  <input type="number" value={anRate} onChange={(e) => setAnRate(parseInt(e.target.value) || 0)} style={{ width: '100px', flex: 'none' }} />
-                </label>
-              </div>
-            </div>
           </div>
         )}
 
@@ -255,6 +241,21 @@ function SetupWizard({ onComplete }) {
               </div>
             ))}
             <button onClick={addPaper} className="btn-secondary">+ Add Paper</button>
+
+            <div className="rate-settings" style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <h3 style={{ color: '#cbd5e1', marginBottom: '1rem' }}>Auto-Allocator Settings</h3>
+              <p style={{ marginBottom: '1rem' }}>Adjust the capacity rates before completing setup to see different generation results.</p>
+              <div className="input-group" style={{ display: 'flex', gap: '2rem' }}>
+                <label style={{ color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  FN Capacity:
+                  <input type="number" value={fnRate} onChange={(e) => setFnRate(parseInt(e.target.value) || 0)} style={{ width: '100px', flex: 'none' }} />
+                </label>
+                <label style={{ color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  AN Capacity:
+                  <input type="number" value={anRate} onChange={(e) => setAnRate(parseInt(e.target.value) || 0)} style={{ width: '100px', flex: 'none' }} />
+                </label>
+              </div>
+            </div>
           </div>
         )}
 
