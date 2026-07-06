@@ -5,6 +5,9 @@ function SetupWizard({ onComplete }) {
   const [step, setStep] = useState(1);
   
   // Data States
+  const [fnRate, setFnRate] = useState(18);
+  const [anRate, setAnRate] = useState(12);
+
   const [sessions, setSessions] = useState([
     { date: '2026-07-07', type: 'FN' },
     { date: '2026-07-07', type: 'AN' },
@@ -92,17 +95,51 @@ function SetupWizard({ onComplete }) {
     
     Object.keys(examiners).forEach(teamName => {
       examiners[teamName].forEach(exName => {
-        cleanSessions.forEach(session => {
+        cleanSessions.forEach(sessionStr => {
           Object.keys(papers).forEach(paperId => {
             allocations.push({
               id: idCounter++,
               team: teamName,
               examiner: exName,
-              session: session,
+              session: sessionStr,
               paper: paperId,
               count: 0 // Blank starting grid
             });
           });
+        });
+      });
+    });
+
+    // Auto-Allocator Logic
+    const paperTracker = {};
+    Object.keys(papers).forEach(pId => {
+      paperTracker[pId] = papers[pId].count; // remaining scripts
+    });
+
+    const paperKeys = Object.keys(papers);
+
+    Object.keys(examiners).forEach(teamName => {
+      examiners[teamName].forEach(exName => {
+        cleanSessions.forEach(sessionStr => {
+          let remainingCapacity = sessionStr.includes('(FN)') ? fnRate : anRate;
+
+          for (const pId of paperKeys) {
+            if (remainingCapacity <= 0) break;
+            
+            if (paperTracker[pId] > 0) {
+              const scriptsToTake = Math.min(remainingCapacity, paperTracker[pId]);
+              
+              const targetAlloc = allocations.find(a => 
+                a.team === teamName && a.examiner === exName && a.session === sessionStr && a.paper === pId
+              );
+              
+              if (targetAlloc) {
+                targetAlloc.count = scriptsToTake;
+                paperTracker[pId] -= scriptsToTake;
+                remainingCapacity -= scriptsToTake;
+              }
+            }
+          }
         });
       });
     });
@@ -143,6 +180,20 @@ function SetupWizard({ onComplete }) {
               </div>
             ))}
             <button onClick={addSession} className="btn-secondary">+ Add Session</button>
+
+            <div className="rate-settings" style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <h3 style={{ color: '#cbd5e1', marginBottom: '1rem' }}>Auto-Allocator Settings</h3>
+              <div className="input-group" style={{ display: 'flex', gap: '2rem' }}>
+                <label style={{ color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  FN Capacity:
+                  <input type="number" value={fnRate} onChange={(e) => setFnRate(parseInt(e.target.value) || 0)} style={{ width: '100px', flex: 'none' }} />
+                </label>
+                <label style={{ color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  AN Capacity:
+                  <input type="number" value={anRate} onChange={(e) => setAnRate(parseInt(e.target.value) || 0)} style={{ width: '100px', flex: 'none' }} />
+                </label>
+              </div>
+            </div>
           </div>
         )}
 
