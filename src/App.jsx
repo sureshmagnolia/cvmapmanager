@@ -556,7 +556,7 @@ function BundleSlips({ computedAllocations, initialPapers, teamChiefs, standalon
           <style>{`
             @page { size: A4 ${orientation}; margin: 5mm; }
             body { background: #fff; }
-            .slip-item { height: 18vh; margin-bottom: 1.5vh; page-break-inside: avoid; border: 2px dashed #000; padding: 10px; }
+            .slip-item { margin-bottom: 1.5vh; page-break-inside: avoid; border: 2px dashed #000; padding: 10px; }
           `}</style>
         </div>
       )}
