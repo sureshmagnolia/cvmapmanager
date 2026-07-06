@@ -4,19 +4,19 @@ import { initialPapers, sessions, initialAllocations, teamChiefs, defaultExamine
 
 function App() {
   const [allocations, setAllocations] = useState(() => {
-    const saved = localStorage.getItem('valuation_allocations_camp2');
+    const saved = localStorage.getItem('valuation_allocations_camp2_v2');
     return saved ? JSON.parse(saved) : initialAllocations;
   });
   const [examiners, setExaminers] = useState(() => {
-    const saved = localStorage.getItem('valuation_examiners_camp2');
+    const saved = localStorage.getItem('valuation_examiners_camp2_v2');
     return saved ? JSON.parse(saved) : defaultExaminers;
   });
   const [fileHandle, setFileHandle] = useState(null);
 
   // Auto-save to localStorage seamlessly on every change
   useEffect(() => {
-    localStorage.setItem('valuation_allocations_camp2', JSON.stringify(allocations));
-    localStorage.setItem('valuation_examiners_camp2', JSON.stringify(examiners));
+    localStorage.setItem('valuation_allocations_camp2_v2', JSON.stringify(allocations));
+    localStorage.setItem('valuation_examiners_camp2_v2', JSON.stringify(examiners));
   }, [allocations, examiners]);
 
   // Auto-save when state changes and file is connected

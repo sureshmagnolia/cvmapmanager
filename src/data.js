@@ -9,59 +9,59 @@ export const initialPapers = {
 };
 
 export const sessions = [
-    "6th Jul (AN)", "7th Jul (FN)", "7th Jul (AN)", "8th Jul (FN)", "8th Jul (AN)"
+    "7th Jul (FN) - Discussion", "7th Jul (AN)", "8th Jul (FN)", "8th Jul (AN)", "9th Jul (FN)", "9th Jul (AN)"
 ];
 
 export const initialAllocations = [
     // Team 1
-    { id: 1, team: "Team 1", examiner: "Examiner 1 (EVS)", session: "6th Jul (AN)", paper: "EVS", count: 12 },
-    { id: 2, team: "Team 1", examiner: "Examiner 1 (EVS)", session: "7th Jul (FN)", paper: "EVS", count: 11 },
+    { id: 1, team: "Team 1", examiner: "Examiner 1 (EVS)", session: "7th Jul (AN)", paper: "EVS", count: 12 },
+    { id: 2, team: "Team 1", examiner: "Examiner 1 (EVS)", session: "8th Jul (FN)", paper: "EVS", count: 11 },
 
-    { id: 3, team: "Team 1", examiner: "Examiner 2", session: "6th Jul (AN)", paper: "Microbial", count: 12 },
-    { id: 4, team: "Team 1", examiner: "Examiner 2", session: "7th Jul (FN)", paper: "Microbial", count: 18 },
-    { id: 5, team: "Team 1", examiner: "Examiner 2", session: "7th Jul (AN)", paper: "Microbial", count: 12 },
-    { id: 6, team: "Team 1", examiner: "Examiner 2", session: "8th Jul (FN)", paper: "Microbial", count: 17 },
-    { id: 7, team: "Team 1", examiner: "Examiner 2", session: "8th Jul (AN)", paper: "MDC", count: 8 },
+    { id: 3, team: "Team 1", examiner: "Examiner 2", session: "7th Jul (AN)", paper: "Microbial", count: 12 },
+    { id: 4, team: "Team 1", examiner: "Examiner 2", session: "8th Jul (FN)", paper: "Microbial", count: 18 },
+    { id: 5, team: "Team 1", examiner: "Examiner 2", session: "8th Jul (AN)", paper: "Microbial", count: 12 },
+    { id: 6, team: "Team 1", examiner: "Examiner 2", session: "9th Jul (FN)", paper: "Microbial", count: 17 },
+    { id: 7, team: "Team 1", examiner: "Examiner 2", session: "9th Jul (AN)", paper: "MDC", count: 8 },
 
-    { id: 8, team: "Team 1", examiner: "Examiner 3", session: "6th Jul (AN)", paper: "Microbial", count: 12 },
-    { id: 9, team: "Team 1", examiner: "Examiner 3", session: "7th Jul (FN)", paper: "Microbial", count: 18 },
-    { id: 10, team: "Team 1", examiner: "Examiner 3", session: "7th Jul (AN)", paper: "Microbial", count: 12 },
-    { id: 11, team: "Team 1", examiner: "Examiner 3", session: "8th Jul (FN)", paper: "Microbial", count: 16 },
-    { id: 12, team: "Team 1", examiner: "Examiner 3", session: "8th Jul (AN)", paper: "MDC", count: 9 },
+    { id: 8, team: "Team 1", examiner: "Examiner 3", session: "7th Jul (AN)", paper: "Microbial", count: 12 },
+    { id: 9, team: "Team 1", examiner: "Examiner 3", session: "8th Jul (FN)", paper: "Microbial", count: 18 },
+    { id: 10, team: "Team 1", examiner: "Examiner 3", session: "8th Jul (AN)", paper: "Microbial", count: 12 },
+    { id: 11, team: "Team 1", examiner: "Examiner 3", session: "9th Jul (FN)", paper: "Microbial", count: 16 },
+    { id: 12, team: "Team 1", examiner: "Examiner 3", session: "9th Jul (AN)", paper: "MDC", count: 9 },
 
-    { id: 13, team: "Team 1", examiner: "Examiner 4", session: "6th Jul (AN)", paper: "Microbial", count: 12 },
-    { id: 14, team: "Team 1", examiner: "Examiner 4", session: "7th Jul (FN)", paper: "Microbial", count: 18 },
-    { id: 15, team: "Team 1", examiner: "Examiner 4", session: "7th Jul (AN)", paper: "Microbial", count: 12 },
-    { id: 16, team: "Team 1", examiner: "Examiner 4", session: "8th Jul (FN)", paper: "Microbial", count: 6 },
-    { id: 17, team: "Team 1", examiner: "Examiner 4", session: "8th Jul (FN)", paper: "Crypto", count: 10 },
-    { id: 18, team: "Team 1", examiner: "Examiner 4", session: "8th Jul (AN)", paper: "MDC", count: 8 },
+    { id: 13, team: "Team 1", examiner: "Examiner 4", session: "7th Jul (AN)", paper: "Microbial", count: 12 },
+    { id: 14, team: "Team 1", examiner: "Examiner 4", session: "8th Jul (FN)", paper: "Microbial", count: 18 },
+    { id: 15, team: "Team 1", examiner: "Examiner 4", session: "8th Jul (AN)", paper: "Microbial", count: 12 },
+    { id: 16, team: "Team 1", examiner: "Examiner 4", session: "9th Jul (FN)", paper: "Microbial", count: 6 },
+    { id: 17, team: "Team 1", examiner: "Examiner 4", session: "9th Jul (FN)", paper: "Crypto", count: 10 },
+    { id: 18, team: "Team 1", examiner: "Examiner 4", session: "9th Jul (AN)", paper: "MDC", count: 8 },
 
     // Team 2
-    { id: 19, team: "Team 2", examiner: "Examiner 5", session: "6th Jul (AN)", paper: "Minor3", count: 12 },
-    { id: 20, team: "Team 2", examiner: "Examiner 5", session: "7th Jul (FN)", paper: "Minor3", count: 18 },
-    { id: 21, team: "Team 2", examiner: "Examiner 5", session: "7th Jul (AN)", paper: "Minor3", count: 12 },
-    { id: 22, team: "Team 2", examiner: "Examiner 5", session: "8th Jul (FN)", paper: "Minor3", count: 17 },
-    { id: 23, team: "Team 2", examiner: "Examiner 5", session: "8th Jul (AN)", paper: "MDC", count: 9 },
+    { id: 19, team: "Team 2", examiner: "Examiner 5", session: "7th Jul (AN)", paper: "Minor3", count: 12 },
+    { id: 20, team: "Team 2", examiner: "Examiner 5", session: "8th Jul (FN)", paper: "Minor3", count: 18 },
+    { id: 21, team: "Team 2", examiner: "Examiner 5", session: "8th Jul (AN)", paper: "Minor3", count: 12 },
+    { id: 22, team: "Team 2", examiner: "Examiner 5", session: "9th Jul (FN)", paper: "Minor3", count: 17 },
+    { id: 23, team: "Team 2", examiner: "Examiner 5", session: "9th Jul (AN)", paper: "MDC", count: 9 },
 
-    { id: 24, team: "Team 2", examiner: "Examiner 6", session: "6th Jul (AN)", paper: "Minor3", count: 12 },
-    { id: 25, team: "Team 2", examiner: "Examiner 6", session: "7th Jul (FN)", paper: "Minor3", count: 18 },
-    { id: 26, team: "Team 2", examiner: "Examiner 6", session: "7th Jul (AN)", paper: "Minor3", count: 12 },
-    { id: 27, team: "Team 2", examiner: "Examiner 6", session: "8th Jul (FN)", paper: "Minor3", count: 16 },
-    { id: 28, team: "Team 2", examiner: "Examiner 6", session: "8th Jul (AN)", paper: "MDC", count: 9 },
+    { id: 24, team: "Team 2", examiner: "Examiner 6", session: "7th Jul (AN)", paper: "Minor3", count: 12 },
+    { id: 25, team: "Team 2", examiner: "Examiner 6", session: "8th Jul (FN)", paper: "Minor3", count: 18 },
+    { id: 26, team: "Team 2", examiner: "Examiner 6", session: "8th Jul (AN)", paper: "Minor3", count: 12 },
+    { id: 27, team: "Team 2", examiner: "Examiner 6", session: "9th Jul (FN)", paper: "Minor3", count: 16 },
+    { id: 28, team: "Team 2", examiner: "Examiner 6", session: "9th Jul (AN)", paper: "MDC", count: 9 },
 
-    { id: 29, team: "Team 2", examiner: "Examiner 7", session: "6th Jul (AN)", paper: "Minor3", count: 12 },
-    { id: 30, team: "Team 2", examiner: "Examiner 7", session: "7th Jul (FN)", paper: "Minor3", count: 18 },
-    { id: 31, team: "Team 2", examiner: "Examiner 7", session: "7th Jul (AN)", paper: "Minor3", count: 10 },
-    { id: 32, team: "Team 2", examiner: "Examiner 7", session: "7th Jul (AN)", paper: "Nutra", count: 2 },
-    { id: 33, team: "Team 2", examiner: "Examiner 7", session: "8th Jul (FN)", paper: "Nutra", count: 16 },
-    { id: 34, team: "Team 2", examiner: "Examiner 7", session: "8th Jul (AN)", paper: "MDC", count: 9 },
+    { id: 29, team: "Team 2", examiner: "Examiner 7", session: "7th Jul (AN)", paper: "Minor3", count: 12 },
+    { id: 30, team: "Team 2", examiner: "Examiner 7", session: "8th Jul (FN)", paper: "Minor3", count: 18 },
+    { id: 31, team: "Team 2", examiner: "Examiner 7", session: "8th Jul (AN)", paper: "Minor3", count: 10 },
+    { id: 32, team: "Team 2", examiner: "Examiner 7", session: "8th Jul (AN)", paper: "Nutra", count: 2 },
+    { id: 33, team: "Team 2", examiner: "Examiner 7", session: "9th Jul (FN)", paper: "Nutra", count: 16 },
+    { id: 34, team: "Team 2", examiner: "Examiner 7", session: "9th Jul (AN)", paper: "MDC", count: 9 },
 
-    { id: 35, team: "Team 2", examiner: "Examiner 8", session: "6th Jul (AN)", paper: "Minor4", count: 12 },
-    { id: 36, team: "Team 2", examiner: "Examiner 8", session: "7th Jul (FN)", paper: "Minor4", count: 18 },
-    { id: 37, team: "Team 2", examiner: "Examiner 8", session: "7th Jul (AN)", paper: "Minor4", count: 12 },
-    { id: 38, team: "Team 2", examiner: "Examiner 8", session: "8th Jul (FN)", paper: "Minor4", count: 7 },
-    { id: 39, team: "Team 2", examiner: "Examiner 8", session: "8th Jul (FN)", paper: "Minor3", count: 9 },
-    { id: 40, team: "Team 2", examiner: "Examiner 8", session: "8th Jul (AN)", paper: "MDC", count: 9 }
+    { id: 35, team: "Team 2", examiner: "Examiner 8", session: "7th Jul (AN)", paper: "Minor4", count: 12 },
+    { id: 36, team: "Team 2", examiner: "Examiner 8", session: "8th Jul (FN)", paper: "Minor4", count: 18 },
+    { id: 37, team: "Team 2", examiner: "Examiner 8", session: "8th Jul (AN)", paper: "Minor4", count: 12 },
+    { id: 38, team: "Team 2", examiner: "Examiner 8", session: "9th Jul (FN)", paper: "Minor4", count: 7 },
+    { id: 39, team: "Team 2", examiner: "Examiner 8", session: "9th Jul (FN)", paper: "Minor3", count: 9 },
+    { id: 40, team: "Team 2", examiner: "Examiner 8", session: "9th Jul (AN)", paper: "MDC", count: 9 }
 ];
 
 export const teamChiefs = {
