@@ -592,11 +592,12 @@ function BundleSlips({ computedAllocations, initialPapers, teamChiefs, standalon
           </div>
           
           <div className="slip-footer">
-            <div className="slip-row">
+            <div className="slip-row" style={{ flex: 1 }}></div>
+            <div className="slip-row" style={{ flex: 2, textAlign: "center" }}>
               <span className="slip-label">False Numbers</span>
               <span className="slip-false-nos">{slip.start} to {slip.end}</span>
             </div>
-            <div className="slip-row" style={{textAlign: "right"}}>
+            <div className="slip-row" style={{ flex: 1, textAlign: "right" }}>
               <span className="slip-label">Total Scripts</span>
               <span className="slip-count">{slip.count}</span>
             </div>
