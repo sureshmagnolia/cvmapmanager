@@ -1,0 +1,740 @@
+:root {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-print {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.btn-print:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.paper-dashboard {
+  margin-bottom: 3rem;
+}
+
+.paper-dashboard h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
+}
+
+.paper-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.paper-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.2s;
+}
+
+.paper-card:hover {
+  transform: translateY(-2px);
+}
+
+.paper-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.paper-card.error { border-color: var(--error); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+.paper-card.warning { border-color: var(--warning); }
+.paper-card.success { border-color: var(--success); }
+
+.paper-card.error .remaining { color: var(--error); font-weight: bold; }
+.paper-card.warning .remaining { color: var(--warning); font-weight: bold; }
+.paper-card.success .remaining { color: var(--success); font-weight: bold; }
+
+.team-section {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.team-title-block h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #f8fafc;
+}
+
+.chief-box {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.swap-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+}
+
+.swap-controls select {
+  background: #1e293b;
+  color: white;
+  border: 1px solid #334155;
+  padding: 0.4rem;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.swap-icon {
+  color: #94a3b8;
+  font-size: 1.2rem;
+}
+
+.swap-controls button {
+  background: #475569;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.swap-controls button:hover:not(:disabled) {
+  background: #64748b;
+}
+
+.swap-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Table Styles */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--glass-bg);
+}
+
+th {
+  background: rgba(30, 41, 59, 0.7);
+  color: #e2e8f0;
+  font-weight: 600;
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: top;
+}
+
+td.examiner-name {
+  font-weight: 600;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.4);
+  min-width: 150px;
+}
+
+.total-col {
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 1.1rem;
+}
+
+.chief-bundle-row {
+  background: rgba(131, 24, 67, 0.2);
+}
+
+.chief-bundle-row td {
+  border-bottom: 2px solid rgba(190, 24, 93, 0.3);
+}
+
+.bundle-label {
+  font-weight: 700;
+  color: #fce7f3;
+}
+
+.bundle-block {
+  margin-bottom: 0.5rem;
+}
+
+.bundle-content {
+  background: rgba(131, 24, 67, 0.4);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.bundle-block:last-child {
+  margin-bottom: 0;
+}
+
+.bundle-count {
+  font-weight: 700;
+  color: #f472b6;
+  font-size: 1.05rem;
+}
+
+/* Allocations */
+.alloc-block {
+  margin-bottom: 0.5rem;
+}
+
+.alloc-block:last-child {
+  margin-bottom: 0;
+}
+
+.alloc-content {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.alloc-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.alloc-paper {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.alloc-qp {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  font-family: monospace;
+}
+
+.alloc-range {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.plus-divider {
+  text-align: center;
+  color: #38bdf8;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.empty-cell {
+  color: #64748b;
+  font-style: italic;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.count-input {
+  width: 60px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  padding: 0.25rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: bold;
+  text-align: center;
+}
+
+.count-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+/* Daily Reports Styles */
+.print-daily-only {
+  display: none;
+}
+
+.daily-page {
+  margin-bottom: 2cm;
+}
+
+.daily-header {
+  border-bottom: 2px solid var(--glass-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.daily-title {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.daily-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  color: #e2e8f0;
+}
+
+.daily-chief-bundle {
+  background: rgba(131, 24, 67, 0.2);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.daily-chief-bundle h3 {
+  margin: 0;
+  color: #fce7f3;
+}
+
+.bundle-cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.daily-alloc-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.daily-alloc-card {
+  width: 220px;
+  margin-bottom: 0 !important;
+}
+
+.alloc-paper {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.alloc-qp {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.alloc-range {
+  font-family: monospace;
+  color: #60a5fa;
+  font-size: 0.85rem;
+}
+
+.chief-bundle-row {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.chief-bundle-row td {
+  border-top: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.bundle-label {
+  font-weight: bold;
+  color: #93c5fd;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.bundle-block {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+}
+
+.bundle-count {
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+.file-status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-connected {
+  color: var(--success);
+}
+
+.status-disconnected {
+  color: #94a3b8;
+}
+
+.print-only {
+  display: none;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: 1px solid var(--glass-border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-print {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.btn-print:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Team Rosters Styles */
+.print-rosters-only {
+  display: none;
+}
+
+.roster-page {
+  padding: 2rem;
+  font-family: sans-serif;
+  page-break-after: always;
+}
+
+.roster-header {
+  text-align: center;
+  border-bottom: 3px solid #000;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.roster-title {
+  font-size: 2.5rem;
+  color: #000 !important;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.roster-chief h2, .roster-members h2 {
+  color: #334155 !important;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #cbd5e1;
+  padding-bottom: 0.5rem;
+}
+
+.roster-card {
+  display: flex;
+  align-items: center;
+  background: #f8fafc !important;
+  border: 1px solid #94a3b8 !important;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: none !important;
+}
+
+.chief-card {
+  background: #f0f9ff !important;
+  border: 2px solid #0284c7 !important;
+}
+
+.roster-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.roster-number {
+  font-weight: bold;
+  color: #64748b !important;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+  width: 30px;
+}
+
+.roster-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #000 !important;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Print Styles */
+@media print {
+  body.print-overview-mode .print-daily-only,
+  body.print-overview-mode .print-rosters-only {
+    display: none !important;
+  }
+  
+  body.print-daily-mode .print-overview-only,
+  body.print-daily-mode .print-rosters-only {
+    display: none !important;
+  }
+  
+  body.print-rosters-mode .print-overview-only,
+  body.print-rosters-mode .print-daily-only {
+    display: none !important;
+  }
+  
+  body.print-daily-mode .print-daily-only {
+    display: block !important;
+  }
+
+  body.print-rosters-mode .print-rosters-only {
+    display: block !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 5mm;
+  }
+  
+  body {
+    background: white;
+    color: black;
+    font-size: 9pt;
+  }
+  
+  .daily-page {
+    page-break-after: always;
+    margin-bottom: 0;
+  }
+  
+  .daily-title {
+    color: black !important;
+  }
+  
+  .daily-meta {
+    color: black !important;
+  }
+  
+  .daily-chief-bundle {
+    background: transparent !important;
+    border: 1px solid black !important;
+  }
+  
+  .daily-chief-bundle h3 {
+    color: black !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: inline;
+  }
+  
+  .app-container {
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  .team-section {
+    background: white;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 0;
+    page-break-inside: avoid;
+    page-break-after: always;
+  }
+  
+  .team-title-block h2 {
+    color: black !important;
+    font-size: 14pt;
+    margin-bottom: 4px;
+  }
+  
+  .chief-box {
+    background: transparent;
+    border: 1px solid black;
+    color: black !important;
+    padding: 2px 4px;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 8.5pt;
+    color: black !important;
+  }
+  
+  th, td {
+    border: 1px solid #000;
+    padding: 3px;
+    color: black !important;
+    word-wrap: break-word;
+  }
+  
+  th {
+    background: #f0f0f0 !important;
+    color: black !important;
+    font-size: 8.5pt;
+  }
+  
+  th:last-child, td.total-col {
+    width: 60px !important;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  td.examiner-name {
+    color: black !important;
+    font-weight: bold;
+    width: 150px;
+  }
+  
+  .bundle-label, .bundle-count, .alloc-paper, .alloc-qp, .alloc-range, .plus-divider, .empty-cell {
+    color: black !important;
+  }
+  
+  .alloc-qp {
+    font-size: 7.5pt;
+  }
+
+  .alloc-content, .bundle-content {
+    background: #fff !important;
+    border: 1px solid #000 !important;
+    border-radius: 4px;
+    padding: 6px !important;
+    box-shadow: none !important;
+    margin-bottom: 6px;
+    page-break-inside: avoid;
+  }
+  
+  .plus-divider {
+    text-align: center;
+    color: black !important;
+    font-weight: bold;
+    margin-bottom: 4px;
+    margin-top: 4px;
+  }
+  
+  .chief-bundle-row {
+    background: #f8f8f8;
+  }
+  
+  .bundle-label {
+    color: black;
+  }
+}

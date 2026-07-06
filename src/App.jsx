@@ -1,0 +1,508 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import './App.css';
+import { initialPapers, sessions, initialAllocations, teamChiefs, defaultExaminers } from './data';
+
+function App() {
+  const [allocations, setAllocations] = useState(() => {
+    const saved = localStorage.getItem('valuation_allocations_camp2');
+    return saved ? JSON.parse(saved) : initialAllocations;
+  });
+  const [examiners, setExaminers] = useState(() => {
+    const saved = localStorage.getItem('valuation_examiners_camp2');
+    return saved ? JSON.parse(saved) : defaultExaminers;
+  });
+  const [fileHandle, setFileHandle] = useState(null);
+
+  // Auto-save to localStorage seamlessly on every change
+  useEffect(() => {
+    localStorage.setItem('valuation_allocations_camp2', JSON.stringify(allocations));
+    localStorage.setItem('valuation_examiners_camp2', JSON.stringify(examiners));
+  }, [allocations, examiners]);
+
+  // Auto-save when state changes and file is connected
+  useEffect(() => {
+    if (fileHandle) {
+      const saveData = async () => {
+        try {
+          const writable = await fileHandle.createWritable();
+          await writable.write(JSON.stringify({ allocations, examiners }, null, 2));
+          await writable.close();
+        } catch (e) {
+          console.error("Auto-save failed", e);
+        }
+      };
+      saveData();
+    }
+  }, [allocations, examiners, fileHandle]);
+
+  const loadFromFile = async () => {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+      });
+      const file = await handle.getFile();
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (data.allocations && data.examiners) {
+        setAllocations(data.allocations);
+        setExaminers(data.examiners);
+        setFileHandle(handle);
+        alert("Data loaded successfully! Auto-saving is now active.");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const saveAsNewFile = async () => {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'valuation_data.json',
+        types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(JSON.stringify({ allocations, examiners }, null, 2));
+      await writable.close();
+      setFileHandle(handle);
+      alert("File created! Auto-saving is now active to this file.");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Compute calculated allocations with False Numbers
+  const { computedAllocations, paperStats } = useMemo(() => {
+    // Clone papers to track current false numbers and remaining counts
+    const trackers = {};
+    Object.keys(initialPapers).forEach(key => {
+      trackers[key] = {
+        current: initialPapers[key].start,
+        remaining: initialPapers[key].count,
+        used: 0
+      };
+    });
+
+    const computed = allocations.map(alloc => {
+      const pKey = alloc.paper;
+      const count = parseInt(alloc.count, 10) || 0;
+      
+      let start = null;
+      let end = null;
+      
+      if (count > 0) {
+        start = trackers[pKey].current;
+        end = start + count - 1;
+        trackers[pKey].current += count;
+        trackers[pKey].remaining -= count;
+        trackers[pKey].used += count;
+      }
+      
+      return { ...alloc, start, end, actualCount: count };
+    });
+    
+    return { computedAllocations: computed, paperStats: trackers };
+  }, [allocations]);
+
+  const updateCount = (id, newCount) => {
+    setAllocations(prev => prev.map(a => a.id === id ? { ...a, count: newCount } : a));
+  };
+
+  const swapExaminers = (team, ex1, ex2) => {
+    if (!ex1 || !ex2 || ex1 === ex2) return;
+    
+    // Swap the names in the examiners list to change UI row order
+    setExaminers(prev => ({
+        ...prev,
+        [team]: prev[team].map(e => e === ex1 ? ex2 : e === ex2 ? ex1 : e)
+    }));
+
+    // Swap the names attached to the allocations so the new row inherits the exact same scripts
+    setAllocations(prev => prev.map(a => {
+      if (a.team !== team) return a;
+      if (a.examiner === ex1) return { ...a, examiner: ex2 };
+      if (a.examiner === ex2) return { ...a, examiner: ex1 };
+      return a;
+    }));
+  };
+
+  const handlePrintOverview = () => {
+    document.body.classList.remove('print-daily-mode', 'print-rosters-mode');
+    document.body.classList.add('print-overview-mode');
+    window.print();
+  };
+
+  const handlePrintDaily = () => {
+    document.body.classList.remove('print-overview-mode', 'print-rosters-mode');
+    document.body.classList.add('print-daily-mode');
+    window.print();
+  };
+
+  const handlePrintRosters = () => {
+    document.body.classList.remove('print-overview-mode', 'print-daily-mode');
+    document.body.classList.add('print-rosters-mode');
+    window.print();
+  };
+
+  return (
+    <div className="app-container">
+      <header className="no-print header-glass">
+        <div>
+          <h1>Valuation Strategy Manager</h1>
+          <div className="file-status">
+            {fileHandle ? <span className="status-connected">🟢 Connected to {fileHandle.name} (Auto-saving)</span> : <span className="status-disconnected">⚪ Working with default data (Not saving)</span>}
+          </div>
+        </div>
+        <div className="header-actions">
+          <button className="btn-secondary" onClick={loadFromFile}>📁 Load JSON</button>
+          <button className="btn-secondary" onClick={saveAsNewFile}>💾 Save JSON As...</button>
+          <button className="btn-print" onClick={handlePrintOverview}>🖨️ Master Overview</button>
+          <button className="btn-print" onClick={handlePrintDaily}>🖨️ Daily Handouts</button>
+          <button className="btn-print" onClick={handlePrintRosters}>🖨️ Team Rosters</button>
+        </div>
+      </header>
+
+      <div className="no-print paper-dashboard">
+        <h2>Papers Overview</h2>
+        <div className="paper-cards">
+          {Object.entries(initialPapers).map(([key, p]) => {
+            const stats = paperStats[key];
+            const isOver = stats.remaining < 0;
+            const isUnder = stats.remaining > 0;
+            return (
+              <div key={key} className={`paper-card ${isOver ? 'error' : ''} ${isUnder ? 'warning' : 'success'}`}>
+                <h3>{p.name}</h3>
+                <div className="stats">
+                  <span>Total: {p.count}</span>
+                  <span>Used: {stats.used}</span>
+                  <span className="remaining">Remaining: {stats.remaining}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="tables-container print-overview-only">
+        <TeamTable 
+          team="Team 1" 
+          chief={teamChiefs["Team 1"]} 
+          examiners={examiners["Team 1"]}
+          sessions={sessions}
+          computedAllocations={computedAllocations}
+          updateCount={updateCount}
+          swapExaminers={swapExaminers}
+        />
+        
+        <TeamTable 
+          team="Team 2" 
+          chief={teamChiefs["Team 2"]} 
+          examiners={examiners["Team 2"]}
+          sessions={sessions}
+          computedAllocations={computedAllocations}
+          updateCount={updateCount}
+          swapExaminers={swapExaminers}
+        />
+      </div>
+
+      <div className="daily-reports-wrapper print-daily-only">
+        <DailyReports 
+          team="Team 1" 
+          chief={teamChiefs["Team 1"]} 
+          examiners={examiners["Team 1"]}
+          sessions={sessions}
+          computedAllocations={computedAllocations}
+        />
+        <DailyReports 
+          team="Team 2" 
+          chief={teamChiefs["Team 2"]} 
+          examiners={examiners["Team 2"]}
+          sessions={sessions}
+          computedAllocations={computedAllocations}
+        />
+      </div>
+
+      <TeamRosters teamChiefs={teamChiefs} examiners={examiners} />
+    </div>
+  );
+}
+
+function TeamRosters({ teamChiefs, examiners }) {
+  return (
+    <div className="rosters-wrapper print-rosters-only">
+      {Object.keys(teamChiefs).map(team => (
+        <div key={team} className="roster-page">
+          <div className="roster-header">
+            <h1 className="roster-title">{team} Roster</h1>
+          </div>
+          
+          <div className="roster-chief">
+            <h2>CHIEF EXAMINER</h2>
+            <div className="roster-card chief-card">
+              <span className="roster-icon">⭐</span>
+              <span className="roster-name">{teamChiefs[team]}</span>
+            </div>
+          </div>
+
+          <div className="roster-members">
+            <h2>TEAM EXAMINERS ({examiners[team].length})</h2>
+            <div className="roster-grid">
+              {examiners[team].map((ex, i) => (
+                <div key={ex} className="roster-card">
+                  <span className="roster-number">{i + 1}</span>
+                  <span className="roster-name">{ex}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DailyReports({ team, chief, examiners, sessions, computedAllocations }) {
+  // Build grid: [session][examiner] = array of allocs
+  const sessionGrid = {};
+  sessions.forEach(s => sessionGrid[s] = {});
+  
+  computedAllocations.forEach(a => {
+    if (a.team === team && a.actualCount > 0) {
+      if (!sessionGrid[a.session][a.examiner]) {
+        sessionGrid[a.session][a.examiner] = [];
+      }
+      sessionGrid[a.session][a.examiner].push(a);
+    }
+  });
+
+  // Calculate Chief bundles per session
+  const chiefBundles = sessions.reduce((acc, s) => {
+    const sessionAllocs = computedAllocations.filter(a => a.team === team && a.session === s && a.actualCount > 0);
+    const paperGroups = {};
+    let sessionTotal = 0;
+    sessionAllocs.forEach(a => {
+      if (!paperGroups[a.paper]) {
+        paperGroups[a.paper] = { count: 0, start: a.start, end: a.end, qp: initialPapers[a.paper].qp, name: initialPapers[a.paper].name };
+      }
+      paperGroups[a.paper].count += a.actualCount;
+      paperGroups[a.paper].start = Math.min(paperGroups[a.paper].start, a.start);
+      paperGroups[a.paper].end = Math.max(paperGroups[a.paper].end, a.end);
+      sessionTotal += a.actualCount;
+    });
+    acc[s] = { groups: Object.values(paperGroups), sessionTotal };
+    return acc;
+  }, {});
+
+  return (
+    <div className="daily-reports-container">
+      {sessions.map(s => {
+        const hasAnyAllocs = examiners.some(ex => sessionGrid[s][ex] && sessionGrid[s][ex].length > 0);
+        if (!hasAnyAllocs && chiefBundles[s].groups.length === 0) return null; // Skip empty sessions
+        
+        return (
+          <div key={s} className="daily-page">
+            <div className="daily-header">
+              <h2 className="daily-title">{team} - Session Handout</h2>
+              <div className="daily-meta">
+                <div><strong>Session:</strong> {s}</div>
+                <div><strong>Chief:</strong> {chief}</div>
+              </div>
+            </div>
+            
+            <div className="daily-chief-bundle">
+              <h3>CHIEF'S BUNDLE (Total: {chiefBundles[s].sessionTotal} Scripts)</h3>
+              <div className="bundle-cards-row">
+                {chiefBundles[s].groups.length === 0 ? "0 Scripts" : chiefBundles[s].groups.map((data, j) => (
+                  <div key={j} className="bundle-content">
+                     <div className="bundle-count">{data.count} {data.name}</div>
+                     <div className="alloc-qp">[QP: {data.qp}]</div>
+                     <div className="alloc-range">({data.start} to {data.end})</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <table className="daily-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '200px' }}>Examiner Name</th>
+                  <th>Scripts to Hand Over</th>
+                  <th style={{ width: '80px', textAlign: 'center' }}>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {examiners.map(ex => {
+                  const allocs = sessionGrid[s][ex];
+                  if (!allocs || allocs.length === 0) return null; // Only show examiners active in this session
+                  
+                  const exTotal = allocs.reduce((sum, a) => sum + a.actualCount, 0);
+                  
+                  return (
+                    <tr key={ex}>
+                      <td className="examiner-name">{ex}</td>
+                      <td>
+                        <div className="daily-alloc-cards">
+                          {allocs.map((a, i) => (
+                             <div key={a.id} className="alloc-content daily-alloc-card">
+                               <div className="alloc-header">
+                                 <span className="alloc-count" style={{fontWeight: 'bold', fontSize: '1.2em', color: 'black'}}>{a.actualCount}</span>
+                                 <span className="alloc-paper" style={{marginLeft: '8px'}}>{initialPapers[a.paper].name}</span>
+                               </div>
+                               <div className="alloc-qp">[QP: {initialPapers[a.paper].qp}]</div>
+                               <div className="alloc-range">({a.start} to {a.end})</div>
+                             </div>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="total-col">{exTotal}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TeamTable({ team, chief, examiners, sessions, computedAllocations, updateCount, swapExaminers }) {
+  const [swap1, setSwap1] = useState('');
+  const [swap2, setSwap2] = useState('');
+
+  const handleSwap = () => {
+    swapExaminers(team, swap1, swap2);
+    setSwap1('');
+    setSwap2('');
+  };
+
+  // Build grid: [examiner][session] = array of allocs
+  const grid = {};
+  examiners.forEach(ex => {
+    grid[ex] = {};
+    sessions.forEach(s => grid[ex][s] = []);
+  });
+
+  computedAllocations.forEach(a => {
+    if (a.team === team && grid[a.examiner]) {
+      grid[a.examiner][a.session].push(a);
+    }
+  });
+
+  // Chief bundles calculation
+  const chiefBundles = sessions.map(s => {
+    const sessionAllocs = computedAllocations.filter(a => a.team === team && a.session === s && a.actualCount > 0);
+    const paperGroups = {};
+    let sessionTotal = 0;
+    sessionAllocs.forEach(a => {
+      if (!paperGroups[a.paper]) {
+        paperGroups[a.paper] = { count: 0, start: a.start, end: a.end, qp: initialPapers[a.paper].qp };
+      }
+      paperGroups[a.paper].count += a.actualCount;
+      paperGroups[a.paper].start = Math.min(paperGroups[a.paper].start, a.start);
+      paperGroups[a.paper].end = Math.max(paperGroups[a.paper].end, a.end);
+      sessionTotal += a.actualCount;
+    });
+    return { groups: Object.entries(paperGroups), sessionTotal };
+  });
+
+  return (
+    <div className="team-section">
+      <div className="team-header">
+        <div className="team-title-block">
+          <h2>{team} Allocation</h2>
+          <div className="chief-box">CHIEF: {chief}</div>
+        </div>
+        
+        <div className="no-print swap-controls">
+          <select value={swap1} onChange={e => setSwap1(e.target.value)}>
+            <option value="">Select Ex 1</option>
+            {examiners.map(e => <option key={e} value={e}>{e}</option>)}
+          </select>
+          <span className="swap-icon">⇄</span>
+          <select value={swap2} onChange={e => setSwap2(e.target.value)}>
+            <option value="">Select Ex 2</option>
+            {examiners.map(e => <option key={e} value={e}>{e}</option>)}
+          </select>
+          <button onClick={handleSwap} disabled={!swap1 || !swap2 || swap1 === swap2}>Swap</button>
+        </div>
+      </div>
+
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Examiner Name<br/><small>(Chief: {chief})</small></th>
+              {sessions.map(s => <th key={s}>{s}</th>)}
+              <th>Total Scripts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="chief-bundle-row">
+              <td className="bundle-label">CHIEF'S BUNDLE<br/><small className="print-only">(Chief: {chief})</small><br/><small>(Total for Session)</small></td>
+              {chiefBundles.map((b, i) => (
+                <td key={i}>
+                  {b.groups.length === 0 ? "0" : b.groups.map(([pKey, data], j) => (
+                    <div key={pKey} className="bundle-block">
+                      {j > 0 && <div className="plus-divider">+</div>}
+                      <div className="bundle-content">
+                        <div className="bundle-count">{data.count} {initialPapers[pKey].name}</div>
+                        <div className="alloc-qp">[QP: {data.qp}]</div>
+                        <div className="alloc-range">({data.start} to {data.end})</div>
+                      </div>
+                    </div>
+                  ))}
+                </td>
+              ))}
+              <td className="total-col">{chiefBundles.reduce((sum, b) => sum + b.sessionTotal, 0)}</td>
+            </tr>
+            {examiners.map(ex => {
+              let exTotal = 0;
+              return (
+                <tr key={ex}>
+                  <td className="examiner-name">{ex}</td>
+                  {sessions.map(s => {
+                    const allocs = grid[ex][s];
+                    if (!allocs || allocs.length === 0) return <td key={s} className="empty-cell">0 (Finished)</td>;
+                    
+                    return (
+                      <td key={s}>
+                        {allocs.map((a, i) => {
+                          exTotal += a.actualCount;
+                          return (
+                            <div key={a.id} className="alloc-block">
+                              {i > 0 && <div className="plus-divider">+</div>}
+                              <div className="alloc-content">
+                                <div className="alloc-header">
+                                  <input 
+                                    type="number" 
+                                    className="no-print count-input" 
+                                    value={a.count} 
+                                    onChange={e => updateCount(a.id, e.target.value)} 
+                                  />
+                                  <span className="print-only alloc-count">{a.actualCount}</span>
+                                  <span className="alloc-paper">{initialPapers[a.paper].name}</span>
+                                </div>
+                                <div className="alloc-qp">[QP: {initialPapers[a.paper].qp}]</div>
+                                {a.actualCount > 0 && (
+                                  <div className="alloc-range">({a.start} to {a.end})</div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </td>
+                    );
+                  })}
+                  <td className="total-col">{exTotal}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export default App;
