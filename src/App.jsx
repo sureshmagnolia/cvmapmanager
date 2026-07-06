@@ -84,7 +84,23 @@ function App() {
 
     let serialCounter = 1;
 
-    const computed = allocations.map(alloc => {
+    const sessionOrder = sessions.reduce((acc, s, i) => ({ ...acc, [s]: i }), {});
+    const examinerOrder = {};
+    Object.keys(examiners).forEach(team => {
+      examinerOrder[team] = examiners[team].reduce((acc, ex, i) => ({ ...acc, [ex]: i }), {});
+    });
+
+    const sortedAllocations = [...allocations].sort((a, b) => {
+      if (sessionOrder[a.session] !== sessionOrder[b.session]) {
+        return sessionOrder[a.session] - sessionOrder[b.session];
+      }
+      if (a.team !== b.team) {
+        return a.team.localeCompare(b.team);
+      }
+      return examinerOrder[a.team][a.examiner] - examinerOrder[b.team][b.examiner];
+    });
+
+    const computed = sortedAllocations.map(alloc => {
       const pKey = alloc.paper;
       const count = parseInt(alloc.count, 10) || 0;
       
