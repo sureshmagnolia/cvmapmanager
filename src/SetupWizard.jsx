@@ -5,16 +5,21 @@ function SetupWizard({ onComplete }) {
   const [step, setStep] = useState(1);
   
   // Data States
-  const [sessions, setSessions] = useState(['7th Jul (FN)', '7th Jul (AN)', '8th Jul (FN)', '8th Jul (AN)']);
+  const [sessions, setSessions] = useState([
+    { date: '2026-07-07', type: 'FN' },
+    { date: '2026-07-07', type: 'AN' },
+    { date: '2026-07-08', type: 'FN' },
+    { date: '2026-07-08', type: 'AN' }
+  ]);
   const [teams, setTeams] = useState([{ name: 'Team 1', chief: '' }]);
   const [examinersData, setExaminersData] = useState([{ team: 'Team 1', name: '' }]);
   const [papersList, setPapersList] = useState([{ id: 'Paper1', name: '', qp: '', start: 1000000, count: 100 }]);
 
   // Handlers for Sessions
-  const addSession = () => setSessions([...sessions, '']);
-  const updateSession = (index, value) => {
+  const addSession = () => setSessions([...sessions, { date: '', type: 'FN' }]);
+  const updateSession = (index, field, value) => {
     const newSessions = [...sessions];
-    newSessions[index] = value;
+    newSessions[index][field] = value;
     setSessions(newSessions);
   };
   const removeSession = (index) => setSessions(sessions.filter((_, i) => i !== index));
@@ -47,7 +52,20 @@ function SetupWizard({ onComplete }) {
 
   const handleFinish = () => {
     // Process Data into App shape
-    const cleanSessions = sessions.filter(s => s.trim());
+    const getOrdinal = (n) => {
+      const s = ["th", "st", "nd", "rd"], v = n % 100;
+      return s[(v - 20) % 10] || s[v] || s[0];
+    };
+    
+    const cleanSessions = sessions
+      .filter(s => s.date)
+      .map(s => {
+        const d = new Date(s.date);
+        const day = d.getDate();
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const month = monthNames[d.getMonth()];
+        return `${day}${getOrdinal(day)} ${month} (${s.type})`;
+      });
     
     const teamChiefs = {};
     teams.forEach(t => { if (t.name) teamChiefs[t.name] = t.chief; });
@@ -113,10 +131,14 @@ function SetupWizard({ onComplete }) {
             {sessions.map((session, index) => (
               <div key={index} className="input-row">
                 <input 
-                  value={session} 
-                  onChange={(e) => updateSession(index, e.target.value)} 
-                  placeholder="e.g. 7th Jul (FN)"
+                  type="date"
+                  value={session.date} 
+                  onChange={(e) => updateSession(index, 'date', e.target.value)} 
                 />
+                <select value={session.type} onChange={(e) => updateSession(index, 'type', e.target.value)}>
+                  <option value="FN">FN</option>
+                  <option value="AN">AN</option>
+                </select>
                 <button onClick={() => removeSession(index)} className="btn-danger">X</button>
               </div>
             ))}
