@@ -785,7 +785,7 @@ function PaperBundlesPrint({ computedAllocations, papers }) {
       if (!paperBundles[a.paper]) {
         paperBundles[a.paper] = [];
       }
-      paperBundles[a.paper].push(a.serial);
+      paperBundles[a.paper].push({ serial: a.serial, examiner: a.examiner });
     }
   });
 
@@ -806,13 +806,19 @@ function PaperBundlesPrint({ computedAllocations, papers }) {
             const bundles = paperBundles[paperKey] || [];
             if (bundles.length === 0) return null;
             
-            bundles.sort((a, b) => a - b);
+            bundles.sort((a, b) => a.serial - b.serial);
             
             return (
               <tr key={paperKey}>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{paper.qp}</td>
                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{paper.name}</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{bundles.join(', ')}</td>
+                <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                  {bundles.map((b, i) => (
+                    <span key={b.serial}>
+                      <strong style={{ fontSize: '1.2em' }}>{b.serial}</strong> ({b.examiner}){i < bundles.length - 1 ? ', ' : ''}
+                    </span>
+                  ))}
+                </td>
               </tr>
             );
           })}
