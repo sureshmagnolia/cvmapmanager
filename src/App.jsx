@@ -182,6 +182,10 @@ function App() {
     window.open(window.location.pathname + '?print=slips', '_blank');
   };
 
+  const handlePrintExaminerBundles = () => {
+    window.open(window.location.pathname + '?print=examiner-bundles', '_blank');
+  };
+
   if (printMode === 'slips') {
     return <BundleSlips standalone computedAllocations={computedAllocations} initialPapers={papers} teamChiefs={chiefs} />;
   }
@@ -212,6 +216,14 @@ function App() {
     );
   }
 
+  if (printMode === 'examiner-bundles') {
+    return (
+      <StandalonePrintWrapper title="Examiner Bundles" orientation="portrait">
+        <ExaminerBundlesPrint teamChiefs={chiefs} examiners={examiners} computedAllocations={computedAllocations} />
+      </StandalonePrintWrapper>
+    );
+  }
+
   return (
     <div className="app-container">
       <header className="no-print header-glass">
@@ -228,6 +240,7 @@ function App() {
           <button className="btn-print" onClick={handlePrintDaily}>🖨️ Daily Handouts</button>
           <button className="btn-print" onClick={handlePrintRosters}>🖨️ Team Rosters</button>
           <button className="btn-print" onClick={handlePrintSlips}>🖨️ Bundle Slips</button>
+          <button className="btn-print" onClick={handlePrintExaminerBundles}>🖨️ Examiner Bundles</button>
         </div>
       </header>
 
@@ -696,6 +709,58 @@ function StandalonePrintWrapper({ title, children, orientation = 'portrait' }) {
       <style>{`
         @page { size: A4 ${orientation}; margin: 5mm; }
       `}</style>
+    </div>
+  );
+}
+
+function ExaminerBundlesPrint({ teamChiefs, examiners, computedAllocations }) {
+  const examinerBundles = {};
+  computedAllocations.forEach(a => {
+    if (a.actualCount > 0) {
+      if (!examinerBundles[a.examiner]) {
+        examinerBundles[a.examiner] = [];
+      }
+      examinerBundles[a.examiner].push(a.serial);
+    }
+  });
+
+  return (
+    <div className="examiner-bundles-print">
+      {Object.keys(examiners).map(team => {
+        const chief = teamChiefs[team];
+        const teamExaminers = examiners[team];
+        
+        return (
+          <div key={team} style={{ marginBottom: '2rem' }}>
+            <h2>{team}</h2>
+            <table className="print-table" style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
+              <thead>
+                <tr>
+                  <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '20%' }}>Name of Chairman</th>
+                  <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '25%' }}>Name of Examiner</th>
+                  <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '55%' }}>Bundle Numbers Assigned</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teamExaminers.map((ex, index) => {
+                  const bundles = examinerBundles[ex] || [];
+                  return (
+                    <tr key={ex}>
+                      {index === 0 && (
+                        <td rowSpan={teamExaminers.length} style={{ border: '1px solid #ccc', padding: '8px', verticalAlign: 'top', fontWeight: 'bold' }}>
+                          {chief}
+                        </td>
+                      )}
+                      <td style={{ border: '1px solid #ccc', padding: '8px' }}>{ex}</td>
+                      <td style={{ border: '1px solid #ccc', padding: '8px' }}>{bundles.length > 0 ? bundles.join(', ') : 'None'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
     </div>
   );
 }
