@@ -190,6 +190,10 @@ function App() {
     window.open(window.location.pathname + '?print=paper-bundles', '_blank');
   };
 
+  const handlePrintSessionBundles = () => {
+    window.open(window.location.pathname + '?print=session-bundles', '_blank');
+  };
+
   if (printMode === 'slips') {
     return <BundleSlips standalone computedAllocations={computedAllocations} initialPapers={papers} teamChiefs={chiefs} />;
   }
@@ -236,6 +240,14 @@ function App() {
     );
   }
 
+  if (printMode === 'session-bundles') {
+    return (
+      <StandalonePrintWrapper title="Session Bundles" orientation="portrait">
+        <SessionBundlesPrint computedAllocations={computedAllocations} papers={papers} sessionsList={sessionsList} />
+      </StandalonePrintWrapper>
+    );
+  }
+
   return (
     <div className="app-container">
       <header className="no-print header-glass">
@@ -254,6 +266,7 @@ function App() {
           <button className="btn-print" onClick={handlePrintSlips}>🖨️ Bundle Slips</button>
           <button className="btn-print" onClick={handlePrintExaminerBundles}>🖨️ Examiner Bundles</button>
           <button className="btn-print" onClick={handlePrintPaperBundles}>🖨️ Paper Bundles</button>
+          <button className="btn-print" onClick={handlePrintSessionBundles}>🖨️ Session Bundles</button>
         </div>
       </header>
 
@@ -821,6 +834,71 @@ function PaperBundlesPrint({ computedAllocations, papers }) {
                 </td>
               </tr>
             );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function SessionBundlesPrint({ computedAllocations, papers, sessionsList }) {
+  const sessionBundles = {};
+  sessionsList.forEach(s => sessionBundles[s] = {});
+
+  computedAllocations.forEach(a => {
+    if (a.actualCount > 0) {
+      if (!sessionBundles[a.session]) {
+        sessionBundles[a.session] = {};
+      }
+      if (!sessionBundles[a.session][a.paper]) {
+        sessionBundles[a.session][a.paper] = [];
+      }
+      sessionBundles[a.session][a.paper].push({ serial: a.serial, examiner: a.examiner });
+    }
+  });
+
+  return (
+    <div className="session-bundles-print">
+      <h2>Session Bundles Overview</h2>
+      <table className="print-table" style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc', marginTop: '1rem' }}>
+        <thead>
+          <tr>
+            <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '15%' }}>Session</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '15%' }}>QP Code</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '30%' }}>Title of Paper</th>
+            <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'left', width: '40%' }}>Bundle numbers</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sessionsList.map(sessionKey => {
+            const papersInSession = sessionBundles[sessionKey] || {};
+            const paperKeys = Object.keys(papersInSession);
+            if (paperKeys.length === 0) return null;
+
+            return paperKeys.map((paperKey, index) => {
+              const paper = papers[paperKey];
+              const bundles = papersInSession[paperKey];
+              bundles.sort((a, b) => a.serial - b.serial);
+
+              return (
+                <tr key={`${sessionKey}-${paperKey}`}>
+                  {index === 0 && (
+                    <td rowSpan={paperKeys.length} style={{ border: '1px solid #ccc', padding: '8px', verticalAlign: 'top', fontWeight: 'bold' }}>
+                      {sessionKey}
+                    </td>
+                  )}
+                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>{paper.qp}</td>
+                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>{paper.name}</td>
+                  <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                    {bundles.map((b, i) => (
+                      <span key={b.serial}>
+                        <strong style={{ fontSize: '1.2em' }}>{b.serial}</strong> ({b.examiner}){i < bundles.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </td>
+                </tr>
+              );
+            });
           })}
         </tbody>
       </table>
